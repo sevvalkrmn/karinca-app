@@ -1,0 +1,62 @@
+# ============================================================
+# Karınca — .gitignore  (PUBLIC REPO — keep all secrets out)
+# ============================================================
+
+# ----- Secrets & credentials (NEVER commit) -----
+# Server-side only: Supabase SERVICE-ROLE key, LLM API keys, etc.
+.env
+.env.*
+!.env.example
+*.local
+secrets.*
+# Android signing
+*.keystore
+*.jks
+keystore.properties
+# Google / Firebase service configs
+google-services.json
+# Supabase local secrets
+supabase/.env
+supabase/.temp/
+
+# ----- Android / Gradle / Kotlin -----
+*.iml
+.gradle/
+local.properties
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+release/
+*.apk
+*.aab
+*.ap_
+*.dex
+app/release/
+lint/
+
+# ----- IntelliJ / Android Studio -----
+.idea/
+*.hprof
+
+# ----- Python / FastAPI AI service -----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+*.log
+
+# ----- OS / editor cruft -----
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
