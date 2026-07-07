@@ -1,0 +1,84 @@
+<!-- GSD:project-start source:PROJECT.md -->
+## Project
+
+**Karınca**
+
+Karınca ("ant" in Turkish) is an offline-first Android budgeting app for the Turkish market (Turkish language, TRY currency) aimed at students and young adults. It is not a passive expense ledger — its defining feature is an **active AI financial coach** that delivers a **background weekly report**: a deterministic analysis of the user's income and spending, narrated in a warm, witty "thrifty ant" personality at a user-chosen bluntness level. The name plays on the idiom *karınca kararınca* — small, consistent saving adds up.
+
+**Core Value:** The user actually saves more money because the weekly coach gives **correct, concrete, trustworthy** advice — comparisons and suggestions grounded in numbers that are always computed deterministically, never invented by the LLM. If everything else fails, this must work.
+
+### Constraints
+
+- **Architecture (do not violate):** The LLM must NEVER compute or invent numbers. All financial calculations (category totals, week/month comparisons, counterfactuals, anomaly detection, goal progress) are done deterministically in Python. The LLM's only job is to narrate pre-computed numbers in the Karınca personality at the chosen tone. Enforced structurally via the `narrate(facts, profile, tone)` boundary.
+- **Client:** Kotlin + Jetpack Compose, MVVM, Hilt (DI). Offline-first: local Room (SQLite) is the source of truth; DataStore for prefs.
+- **Cloud data & auth:** Supabase (Postgres + Auth + RLS + Storage). Client syncs local Room ↔ Supabase.
+- **Sync (MVP):** single-user, multi-device only. UUID primary keys (client-generated), `updated_at` cursors, tombstones (soft deletes), outbox pattern, last-write-wins conflict resolution. (Server-authoritative resolution is a v2 concern that arrives with shared expenses.)
+- **AI service:** a separate Python/FastAPI microservice (deterministic `FinancialEngine` + LLM narrator). Swappable LLM provider behind the `narrate()` boundary. Single structured prompt call — NOT LangGraph. Server-scheduled (cron) trigger, not client-invoked.
+- **Auth:** Google sign-in + phone OTP (both common for the target user).
+- **Payments:** Google Play Billing via RevenueCat (freemium; Pro gates the AI weekly report).
+- **Compliance:** KVKK (Turkish data-protection law) is a Phase 1 design input — explicit consent for storing financial PII (Supabase EU region) and for sending aggregated summaries to the LLM provider.
+- **Typography:** Plus Jakarta Sans.
+<!-- GSD:project-end -->
+
+<!-- CUSTOM:working-agreement (manually maintained — do not remove on regen) -->
+## Working Agreement — UI Division of Labor
+
+**The user writes all UI/Compose screens and visual design themselves.** Do NOT build screen layouts, Composable UI, styling, or visual design.
+
+Claude's role is everything behind and around the UI:
+- Data model, Room (SQLite) entities/DAOs/migrations, Supabase (Postgres) schema + RLS
+- Sync engine (UUID PKs, `updated_at` cursors, tombstones, outbox, last-write-wins)
+- The Python/FastAPI AI service (`FinancialEngine`, `narrate()` boundary, cron trigger)
+- Business logic, ViewModels, UI state (state holders / `StateFlow`), navigation plumbing
+- Wiring the user's UI to the logic (exposing state + events the screens bind to)
+
+When a task would otherwise require a screen, stop at the ViewModel/state/navigation boundary and hand off the UI to the user, describing the state and callbacks their Composable should consume.
+
+**Secrets:** Supabase service-role key and any LLM key are server-side env only — never in the repo or the Android client. The client uses the Supabase anon key + RLS.
+<!-- /CUSTOM:working-agreement -->
+
+<!-- GSD:stack-start source:STACK.md -->
+## Technology Stack
+
+Technology stack not yet documented. Will populate after codebase mapping or first phase.
+<!-- GSD:stack-end -->
+
+<!-- GSD:conventions-start source:CONVENTIONS.md -->
+## Conventions
+
+Conventions not yet established. Will populate as patterns emerge during development.
+<!-- GSD:conventions-end -->
+
+<!-- GSD:architecture-start source:ARCHITECTURE.md -->
+## Architecture
+
+Architecture not yet mapped. Follow existing patterns found in the codebase.
+<!-- GSD:architecture-end -->
+
+<!-- GSD:skills-start source:skills/ -->
+## Project Skills
+
+No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
+<!-- GSD:skills-end -->
+
+<!-- GSD:workflow-start source:GSD defaults -->
+## GSD Workflow Enforcement
+
+Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+
+Use these entry points:
+- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
+- `/gsd-debug` for investigation and bug fixing
+- `/gsd-execute-phase` for planned phase work
+
+Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+<!-- GSD:workflow-end -->
+
+
+
+<!-- GSD:profile-start -->
+## Developer Profile
+
+> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
+> This section is managed by `generate-claude-profile` -- do not edit manually.
+<!-- GSD:profile-end -->

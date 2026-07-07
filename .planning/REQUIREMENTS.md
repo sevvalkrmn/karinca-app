@@ -111,7 +111,7 @@ Explicitly excluded from the product roadmap for the foreseeable future.
 
 ## Traceability
 
-Best-guess mapping pending roadmapper finalization. Each requirement maps to exactly one phase.
+Finalized by roadmapper (ROADMAP.md, 2026-07-07). Phase 1 = Foundation & Data Model, Phase 2 = Free Core, Phase 3 = AI Weekly Report, Phase 4 = Pro / Paywall. Each requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
