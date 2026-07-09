@@ -23,16 +23,24 @@ Karınca ("ant" in Turkish) is an offline-first Android budgeting app for the Tu
 <!-- CUSTOM:working-agreement (manually maintained — do not remove on regen) -->
 ## Working Agreement — UI Division of Labor
 
-**The user writes all UI/Compose screens and visual design themselves.** Do NOT build screen layouts, Composable UI, styling, or visual design.
+**The user designs; Claude implements.** The product's look and personality belong to the user.
 
-Claude's role is everything behind and around the UI:
+**The user owns (do NOT do these):**
+- All screen design in Figma: layout, visual design, brand language, component decisions
+- All user-facing Turkish copy — the "Karınca" voice
+
+**Do NOT invent screen designs or visual layouts.** When a screen is needed, ask the user for the design (Figma screen / screenshot / spec), then implement it faithfully in Compose. If no design has been provided yet, **ask — do not improvise one.**
+
+**Claude owns:**
+- Translating the user's finished designs into Jetpack Compose code
+- Material 3 theme / token setup (colors, typography, shapes)
+- ViewModels, state holders (`StateFlow` / UI state), navigation
 - Data model, Room (SQLite) entities/DAOs/migrations, Supabase (Postgres) schema + RLS
 - Sync engine (UUID PKs, `updated_at` cursors, tombstones, outbox, last-write-wins)
 - The Python/FastAPI AI service (`FinancialEngine`, `narrate()` boundary, cron trigger)
-- Business logic, ViewModels, UI state (state holders / `StateFlow`), navigation plumbing
-- Wiring the user's UI to the logic (exposing state + events the screens bind to)
+- Business logic and all wiring (binding UI to state + events)
 
-When a task would otherwise require a screen, stop at the ViewModel/state/navigation boundary and hand off the UI to the user, describing the state and callbacks their Composable should consume.
+**When writing Compose from the user's designs, briefly explain the structure and the key Compose concepts used** — the user wants to understand and maintain the code, not just receive it.
 
 **Secrets:** Supabase service-role key and any LLM key are server-side env only — never in the repo or the Android client. The client uses the Supabase anon key + RLS.
 <!-- /CUSTOM:working-agreement -->
