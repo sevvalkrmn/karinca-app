@@ -1,4 +1,3 @@
-<!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
 **Karınca**
@@ -18,9 +17,7 @@ Karınca ("ant" in Turkish) is an offline-first Android budgeting app for the Tu
 - **Payments:** Google Play Billing via RevenueCat (freemium; Pro gates the AI weekly report).
 - **Compliance:** KVKK (Turkish data-protection law) is a Phase 1 design input — explicit consent for storing financial PII (Supabase EU region) and for sending aggregated summaries to the LLM provider.
 - **Typography:** Plus Jakarta Sans.
-<!-- GSD:project-end -->
 
-<!-- CUSTOM:working-agreement (manually maintained — do not remove on regen) -->
 ## Working Agreement — UI Division of Labor
 
 **The user designs; Claude implements.** The product's look and personality belong to the user.
@@ -43,50 +40,19 @@ Karınca ("ant" in Turkish) is an offline-first Android budgeting app for the Tu
 **When writing Compose from the user's designs, briefly explain the structure and the key Compose concepts used** — the user wants to understand and maintain the code, not just receive it.
 
 **Secrets:** Supabase service-role key and any LLM key are server-side env only — never in the repo or the Android client. The client uses the Supabase anon key + RLS.
-<!-- /CUSTOM:working-agreement -->
 
-<!-- GSD:stack-start source:STACK.md -->
 ## Technology Stack
 
 Technology stack not yet documented. Will populate after codebase mapping or first phase.
-<!-- GSD:stack-end -->
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
 ## Conventions
 
 Conventions not yet established. Will populate as patterns emerge during development.
-<!-- GSD:conventions-end -->
 
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
 ## Architecture
 
 Architecture not yet mapped. Follow existing patterns found in the codebase.
-<!-- GSD:architecture-end -->
 
-<!-- GSD:skills-start source:skills/ -->
 ## Project Skills
 
 No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
-<!-- GSD:skills-end -->
-
-<!-- GSD:workflow-start source:GSD defaults -->
-## GSD Workflow Enforcement
-
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
-
-Use these entry points:
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd-debug` for investigation and bug fixing
-- `/gsd-execute-phase` for planned phase work
-
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
-<!-- GSD:workflow-end -->
-
-
-
-<!-- GSD:profile-start -->
-## Developer Profile
-
-> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
