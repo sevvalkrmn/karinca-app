@@ -18,6 +18,9 @@ interface PiggyBankEntryDao {
     @Query("SELECT * FROM piggy_bank_entries WHERE id = :id")
     suspend fun get(id: String): PiggyBankEntryEntity?
 
+    @Query("SELECT * FROM piggy_bank_entries WHERE transactionId = :transactionId")
+    suspend fun getByTransactionId(transactionId: String): List<PiggyBankEntryEntity>
+
     @Upsert
     suspend fun upsert(entry: PiggyBankEntryEntity)
 

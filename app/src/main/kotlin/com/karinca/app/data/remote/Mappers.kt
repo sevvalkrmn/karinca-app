@@ -172,6 +172,7 @@ fun PiggyBankEntryDto.toEntity() = PiggyBankEntryEntity(
     userId = userId,
     amount = amount,
     reason = PiggyBankEntryReason.fromValue(reason),
+    transactionId = transactionId,
     createdAt = parseInstant(createdAt),
     updatedAt = parseInstant(updatedAt),
 )
@@ -181,6 +182,7 @@ fun PiggyBankEntryEntity.toDto() = PiggyBankEntryDto(
     userId = userId,
     amount = amount,
     reason = reason.value,
+    transactionId = transactionId,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
 )

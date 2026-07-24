@@ -12,13 +12,17 @@ import java.time.Instant
 // deposits) can each freely insert their own rows without ever conflicting.
 @Entity(
     tableName = "piggy_bank_entries",
-    indices = [Index("userId"), Index("updatedAt")],
+    indices = [Index("userId"), Index("updatedAt"), Index("transactionId")],
 )
 data class PiggyBankEntryEntity(
     @PrimaryKey val id: String,
     val userId: String,
     val amount: Double, // positive = deposit, negative = withdrawal
     val reason: PiggyBankEntryReason,
+    // Only set for OVERSPEND_WITHDRAWAL/OVERSPEND_REVERSAL — the transaction that
+    // caused (or, for a reversal, whose deletion undid) this withdrawal. Null for
+    // server-deposited entries, which have no single transaction behind them.
+    val transactionId: String? = null,
     val createdAt: Instant,
     val updatedAt: Instant,
 )

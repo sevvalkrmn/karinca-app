@@ -38,7 +38,10 @@ enum class PiggyBankEntryReason(val value: String) {
     // Deposit swept in at month's end when actual spending came in under the limit.
     MONTHLY_LEFTOVER("monthly_leftover"),
     // Withdrawal recorded when the user confirms spending past this month's limit.
-    OVERSPEND_WITHDRAWAL("overspend_withdrawal");
+    OVERSPEND_WITHDRAWAL("overspend_withdrawal"),
+    // Compensating deposit when the transaction behind an OVERSPEND_WITHDRAWAL is
+    // later deleted — the withdrawal itself is never edited/removed (append-only).
+    OVERSPEND_REVERSAL("overspend_reversal");
 
     companion object {
         fun fromValue(value: String): PiggyBankEntryReason = entries.first { it.value == value }

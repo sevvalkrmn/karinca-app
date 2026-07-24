@@ -201,6 +201,7 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.update { it.copy(isSaving = true, errorMessage = null) }
         try {
             val id = editingId
+            val transactionId: String
             if (id != null) {
                 transactionRepository.update(
                     id = id,
@@ -211,8 +212,9 @@ class AddTransactionViewModel @Inject constructor(
                     occurredAt = editingOccurredAt,
                     note = null,
                 )
+                transactionId = id
             } else {
-                transactionRepository.create(
+                transactionId = transactionRepository.create(
                     userId = userId,
                     categoryId = categoryId,
                     type = type,
@@ -222,7 +224,7 @@ class AddTransactionViewModel @Inject constructor(
                 )
             }
             if (overageToWithdraw > 0.0) {
-                piggyBankRepository.recordOverspendWithdrawal(userId, overageToWithdraw)
+                piggyBankRepository.recordOverspendWithdrawal(userId, overageToWithdraw, transactionId)
             }
             syncScheduler.requestImmediateSync()
             _events.emit(AddTransactionEvent.Saved)
@@ -242,6 +244,7 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
                 transactionRepository.softDelete(id, uid)
+                piggyBankRepository.reverseOverspendWithdrawalIfAny(uid, id)
                 syncScheduler.requestImmediateSync()
                 _events.emit(AddTransactionEvent.Deleted)
             } catch (e: CancellationException) {

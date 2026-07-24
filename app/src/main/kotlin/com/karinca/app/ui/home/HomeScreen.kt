@@ -19,8 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.ReceiptLong
@@ -126,8 +124,7 @@ fun HomeScreen(
                     balance = uiState.balance,
                     spendableBalance = uiState.spendableBalance,
                     trendPercent = uiState.balanceTrendPercent,
-                    monthIncome = uiState.monthIncome,
-                    monthExpense = uiState.monthExpense,
+                    piggyBankBalance = uiState.piggyBankBalance,
                     onClick = onOpenAnalysis,
                 )
             }
@@ -154,8 +151,7 @@ private fun BalanceCard(
     balance: Double,
     spendableBalance: Double,
     trendPercent: Double?,
-    monthIncome: Double,
-    monthExpense: Double,
+    piggyBankBalance: Double,
     onClick: () -> Unit,
 ) {
     Surface(
@@ -165,57 +161,41 @@ private fun BalanceCard(
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(
-                "MEVCUT BAKİYE",
+                "HARCANABİLİR",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                turkishCurrencyFormat.format(balance),
+                turkishCurrencyFormat.format(spendableBalance),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onPrimary,
             )
             // Only shown once active goals actually reserve something — otherwise it would
-            // just repeat the balance above with an extra label.
+            // just repeat the number above with an extra label.
             if (spendableBalance < balance - 0.01) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Harcanabilir: ${turkishCurrencyFormat.format(spendableBalance)}",
+                    "Mevcut Bakiye: ${turkishCurrencyFormat.format(balance)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f),
                 )
             }
             Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.TrendingUp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "Gelir ${turkishCurrencyFormat.format(monthIncome)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.TrendingDown,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "Gider ${turkishCurrencyFormat.format(monthExpense)}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-                    )
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Filled.Savings,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                    modifier = Modifier.size(14.dp),
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    "Kumbaram ${turkishCurrencyFormat.format(piggyBankBalance)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
+                )
             }
             Spacer(Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {

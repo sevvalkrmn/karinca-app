@@ -10,6 +10,7 @@ import com.karinca.app.data.local.entity.TransactionEntity
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.CategoryRepository
 import com.karinca.app.data.repository.GoalRepository
+import com.karinca.app.data.repository.PiggyBankRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.repository.TransactionRepository
 import com.karinca.app.ui.transactions.ComparisonPeriod
@@ -28,7 +29,6 @@ data class TransactionWithCategory(val transaction: TransactionEntity, val categ
 private data class BalanceInfo(
     val balance: Double,
     val monthNet: Double,
-    val monthIncome: Double,
     val monthExpense: Double,
     val dailyExpense: Double,
 )
@@ -41,11 +41,8 @@ data class HomeUiState(
     // (no transaction is created for it, and it never touches `balance` itself).
     val spendableBalance: Double = 0.0,
     val balanceTrendPercent: Double? = null,
-    // This month's real income/expense so far — shown on the balance card from day one,
-    // unlike balanceTrendPercent which needs a full previous month to mean anything.
-    val monthIncome: Double = 0.0,
-    val monthExpense: Double = 0.0,
     val dailyExpense: Double = 0.0,
+    val piggyBankBalance: Double = 0.0,
     val profile: ProfileEntity? = null,
     // % of this month's expenses against the profile's single reference amount, regardless
     // of whether the user labeled that reference a "Limit" or a "Goal" — the home card
@@ -63,6 +60,7 @@ class HomeViewModel @Inject constructor(
     categoryRepository: CategoryRepository,
     transactionRepository: TransactionRepository,
     goalRepository: GoalRepository,
+    piggyBankRepository: PiggyBankRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = run {
@@ -84,7 +82,6 @@ class HomeViewModel @Inject constructor(
                 BalanceInfo(
                     balance = allIncome - allExpense,
                     monthNet = monthIncome - monthExpense,
-                    monthIncome = monthIncome,
                     monthExpense = monthExpense,
                     dailyExpense = dailyExpense,
                 )
@@ -117,8 +114,6 @@ class HomeViewModel @Inject constructor(
                     balance = balance.balance,
                     spendableBalance = balance.balance - reservedForGoals,
                     balanceTrendPercent = trend,
-                    monthIncome = balance.monthIncome,
-                    monthExpense = balance.monthExpense,
                     dailyExpense = balance.dailyExpense,
                     profile = profile,
                     budgetPercent = if (profile != null && profile.referenceAmount > 0) {
@@ -133,8 +128,9 @@ class HomeViewModel @Inject constructor(
             // authRepository.state re-emits whenever the Supabase session changes (e.g.
             // after AuthRepository.updateFullName()), which is what makes displayName
             // re-read instead of freezing at whatever it was when this Flow first combined.
-            combine(data, authRepository.state) { state, _ ->
+            combine(data, piggyBankRepository.observeBalance(uid), authRepository.state) { state, piggyBalance, _ ->
                 state.copy(
+                    piggyBankBalance = piggyBalance,
                     displayName = authRepository.currentUserFullNameOrNull()?.trim()?.substringBefore(" ")?.takeIf { it.isNotBlank() },
                 )
             }
