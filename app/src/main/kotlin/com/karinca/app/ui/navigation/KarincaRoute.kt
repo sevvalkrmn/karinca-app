@@ -45,4 +45,7 @@ sealed interface KarincaRoute {
 
     @Serializable
     data object WeeklyReport : KarincaRoute
+
+    @Serializable
+    data object Kumbaram : KarincaRoute
 }

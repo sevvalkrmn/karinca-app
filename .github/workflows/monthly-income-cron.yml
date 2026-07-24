@@ -1,0 +1,20 @@
+name: Monthly Auto Income + Kumbara Settlement
+
+on:
+  schedule:
+    # 06:00 Europe/Istanbul (UTC+3), 1st of every month = 03:00 UTC.
+    - cron: "0 3 1 * *"
+  # Lets you trigger a run manually from the Actions tab, e.g. to test the deployed
+  # service without waiting for the 1st of the month.
+  workflow_dispatch: {}
+
+jobs:
+  trigger-monthly-income:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call the monthly income processing endpoint
+        run: |
+          curl -sS -X POST "${{ secrets.AI_SERVICE_URL }}/internal/process-monthly-income" \
+            -H "X-Cron-Secret: ${{ secrets.REPORT_CRON_SECRET }}" \
+            --max-time 120 \
+            --fail

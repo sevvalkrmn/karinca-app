@@ -3,9 +3,12 @@ package com.karinca.app.ui.transactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.local.CategoryKind
+import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.CategoryRepository
+import com.karinca.app.data.repository.PiggyBankRepository
+import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.repository.TransactionRepository
 import com.karinca.app.data.sync.SyncScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -40,6 +44,9 @@ data class AddTransactionUiState(
 sealed interface AddTransactionEvent {
     data object Saved : AddTransactionEvent
     data object Deleted : AddTransactionEvent
+    // This new expense would push the month past the profile's LIMIT reference —
+    // covering the overage from the Kumbara instead needs the user's confirmation first.
+    data class ConfirmOverspend(val overage: Double) : AddTransactionEvent
 }
 
 @HiltViewModel
@@ -47,6 +54,8 @@ class AddTransactionViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     categoryRepository: CategoryRepository,
     private val transactionRepository: TransactionRepository,
+    private val profileRepository: ProfileRepository,
+    private val piggyBankRepository: PiggyBankRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
 
@@ -82,6 +91,7 @@ class AddTransactionViewModel @Inject constructor(
     private var editingId: String? = null
     private var editingOccurredAt: LocalDate = LocalDate.now()
     private var initialized = false
+    private var pendingOverspendOverage: Double? = null
 
     // Called once from the screen's LaunchedEffect — Hilt ViewModels can't take
     // per-navigation arguments via constructor injection, so the route's optional args
@@ -139,38 +149,89 @@ class AddTransactionViewModel @Inject constructor(
         if (amount <= 0.0) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
-            try {
-                val id = editingId
-                if (id != null) {
-                    transactionRepository.update(
-                        id = id,
-                        userId = uid,
-                        categoryId = categoryId,
-                        type = state.type,
-                        amount = amount,
-                        occurredAt = editingOccurredAt,
-                        note = null,
-                    )
-                } else {
-                    transactionRepository.create(
-                        userId = uid,
-                        categoryId = categoryId,
-                        type = state.type,
-                        amount = amount,
-                        occurredAt = LocalDate.now(),
-                        note = null,
-                    )
+            // Only a brand-new expense can trigger this — editing an existing one skips
+            // it, since this month's totals already include whatever it used to be.
+            if (editingId == null && state.type == CategoryKind.EXPENSE) {
+                val overage = computeOverage(uid, amount)
+                if (overage > 0.0) {
+                    pendingOverspendOverage = overage
+                    _events.emit(AddTransactionEvent.ConfirmOverspend(overage))
+                    return@launch
                 }
-                syncScheduler.requestImmediateSync()
-                _events.emit(AddTransactionEvent.Saved)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.message ?: "Kaydedilemedi, tekrar dener misin?") }
-            } finally {
-                _uiState.update { it.copy(isSaving = false) }
             }
+            performSave(uid, categoryId, amount, state.type)
+        }
+    }
+
+    // Only called once the user has seen the overspend warning and agreed to it.
+    fun confirmSaveDespiteOverspend() {
+        val overage = pendingOverspendOverage ?: return
+        val state = uiState.value
+        val uid = userId ?: return
+        val categoryId = state.selectedCategoryId ?: return
+        val amount = state.amountText.replace(',', '.').toDoubleOrNull() ?: return
+        pendingOverspendOverage = null
+        viewModelScope.launch { performSave(uid, categoryId, amount, state.type, overageToWithdraw = overage) }
+    }
+
+    fun dismissOverspendWarning() {
+        pendingOverspendOverage = null
+    }
+
+    // How much of THIS new expense would land outside the month's LIMIT reference —
+    // 0 if the profile isn't LIMIT-based, or if the month (including this amount)
+    // still fits under it.
+    private suspend fun computeOverage(userId: String, amount: Double): Double {
+        val profile = profileRepository.get(userId) ?: return 0.0
+        if (profile.referenceType != ReferenceType.LIMIT) return 0.0
+        val month = DateRanges.current(ComparisonPeriod.MONTH)
+        val before = transactionRepository.observeTotal(userId, CategoryKind.EXPENSE, month.from, month.to).first()
+        val after = before + amount
+        if (after <= profile.referenceAmount) return 0.0
+        return after - maxOf(before, profile.referenceAmount)
+    }
+
+    private suspend fun performSave(
+        userId: String,
+        categoryId: String,
+        amount: Double,
+        type: CategoryKind,
+        overageToWithdraw: Double = 0.0,
+    ) {
+        _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+        try {
+            val id = editingId
+            if (id != null) {
+                transactionRepository.update(
+                    id = id,
+                    userId = userId,
+                    categoryId = categoryId,
+                    type = type,
+                    amount = amount,
+                    occurredAt = editingOccurredAt,
+                    note = null,
+                )
+            } else {
+                transactionRepository.create(
+                    userId = userId,
+                    categoryId = categoryId,
+                    type = type,
+                    amount = amount,
+                    occurredAt = LocalDate.now(),
+                    note = null,
+                )
+            }
+            if (overageToWithdraw > 0.0) {
+                piggyBankRepository.recordOverspendWithdrawal(userId, overageToWithdraw)
+            }
+            syncScheduler.requestImmediateSync()
+            _events.emit(AddTransactionEvent.Saved)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            _uiState.update { it.copy(errorMessage = e.message ?: "Kaydedilemedi, tekrar dener misin?") }
+        } finally {
+            _uiState.update { it.copy(isSaving = false) }
         }
     }
 

@@ -12,6 +12,9 @@ data class TransactionDto(
     val amount: Double,
     @SerialName("occurred_at") val occurredAt: String,
     val note: String? = null,
+    // Null for every normal manually-logged transaction; only 'auto_monthly_income' for
+    // the server-generated salary row the AI service's monthly job creates.
+    val source: String? = null,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String,
     @SerialName("deleted_at") val deletedAt: String? = null,

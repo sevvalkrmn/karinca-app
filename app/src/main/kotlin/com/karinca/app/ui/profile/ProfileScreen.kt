@@ -20,11 +20,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,12 +43,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.ui.components.KarincaBottomBar
 import com.karinca.app.ui.components.KarincaWordmark
+import java.text.NumberFormat
+import java.util.Locale
+
+private val turkishCurrencyFormat: NumberFormat by lazy {
+    NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onSignedOut: () -> Unit,
     onOpenProfileSetup: () -> Unit,
+    onOpenKumbara: () -> Unit,
     onNavigateHome: () -> Unit,
     onNavigateGoals: () -> Unit,
     onNavigateReports: () -> Unit,
@@ -136,10 +143,15 @@ fun ProfileScreen(
                     subtitle = "Gelir, bütçe hedefi ve koç tonunu ayarla",
                     onClick = onOpenProfileSetup,
                 )
+                ProfileMenuRow(
+                    icon = Icons.Filled.Savings,
+                    title = "Kumbaram",
+                    subtitle = "${turkishCurrencyFormat.format(uiState.piggyBankBalance)} biriktin",
+                    onClick = onOpenKumbara,
+                )
                 // Not wired yet — their sub-screens don't exist in the Stitch hand-off.
                 ProfileMenuRow(Icons.Filled.Notifications, "Bildirim Ayarları", "Uyarıları ve hatırlatıcıları seç")
                 ProfileMenuRow(Icons.Filled.Palette, "Uygulama Teması", "Görünümü özelleştir")
-                ProfileMenuRow(Icons.Filled.HelpOutline, "Yardım ve Destek", "Sıkça sorulan sorular")
                 ProfileMenuRow(
                     icon = Icons.Filled.Logout,
                     title = "Çıkış Yap",

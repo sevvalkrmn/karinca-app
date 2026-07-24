@@ -7,6 +7,7 @@ import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
+import com.karinca.app.data.local.dao.PiggyBankEntryDao
 import com.karinca.app.data.local.dao.ProfileDao
 import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
@@ -14,6 +15,7 @@ import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.local.entity.ConsentEntity
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.data.local.entity.OutboxEntity
+import com.karinca.app.data.local.entity.PiggyBankEntryEntity
 import com.karinca.app.data.local.entity.ProfileEntity
 import com.karinca.app.data.local.entity.TransactionEntity
 import com.karinca.app.data.local.entity.WeeklyReportEntity
@@ -25,7 +27,7 @@ import com.karinca.app.data.local.entity.WeeklyReportEntity
 // already-synced rows, so those rows are silently skipped on the next pull instead of
 // being re-downloaded from Supabase. (Top-level, not a KarincaDatabase.VERSION companion
 // constant, so it can be used in this same class's @Database annotation below.)
-internal const val KARINCA_DB_VERSION = 5
+internal const val KARINCA_DB_VERSION = 6
 
 @Database(
     entities = [
@@ -35,6 +37,7 @@ internal const val KARINCA_DB_VERSION = 5
         TransactionEntity::class,
         WeeklyReportEntity::class,
         GoalEntity::class,
+        PiggyBankEntryEntity::class,
         OutboxEntity::class,
     ],
     version = KARINCA_DB_VERSION,
@@ -48,5 +51,6 @@ abstract class KarincaDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun weeklyReportDao(): WeeklyReportDao
     abstract fun goalDao(): GoalDao
+    abstract fun piggyBankEntryDao(): PiggyBankEntryDao
     abstract fun outboxDao(): OutboxDao
 }

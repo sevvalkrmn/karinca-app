@@ -151,7 +151,13 @@ fun GoalsScreen(
             )
         },
     ) { padding ->
-        if (goals.isEmpty()) {
+        // Captured into a plain local val — collectAsStateWithLifecycle's delegated
+        // property can't be smart-cast across branches on its own.
+        val currentGoals = goals
+        if (currentGoals == null) {
+            // Room's first emission hasn't arrived yet — render nothing rather than
+            // flashing the empty state for goals that actually exist.
+        } else if (currentGoals.isEmpty()) {
             Column(
 
                 modifier = Modifier.fillMaxSize().padding(padding).padding(40.dp),
@@ -187,7 +193,7 @@ fun GoalsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth().padding(padding),
             ) {
-                items(goals, key = { it.id }) { goal ->
+                items(currentGoals, key = { it.id }) { goal ->
                     GoalCard(
                         goal = goal,
                         onClick = { editingGoal = goal },

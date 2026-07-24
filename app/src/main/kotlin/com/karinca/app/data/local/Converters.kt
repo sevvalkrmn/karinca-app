@@ -36,4 +36,10 @@ class Converters {
 
     @TypeConverter
     fun valueToCategoryKind(value: String?): CategoryKind? = value?.let(CategoryKind::fromValue)
+
+    @TypeConverter
+    fun piggyBankEntryReasonToValue(value: PiggyBankEntryReason?): String? = value?.value
+
+    @TypeConverter
+    fun valueToPiggyBankEntryReason(value: String?): PiggyBankEntryReason? = value?.let(PiggyBankEntryReason::fromValue)
 }

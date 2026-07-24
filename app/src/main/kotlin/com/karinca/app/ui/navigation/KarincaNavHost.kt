@@ -26,6 +26,7 @@ import com.karinca.app.ui.coach.WeeklyReportScreen
 import com.karinca.app.ui.consent.KvkkConsentScreen
 import com.karinca.app.ui.goals.GoalsScreen
 import com.karinca.app.ui.home.HomeScreen
+import com.karinca.app.ui.profile.KumbaramScreen
 import com.karinca.app.ui.profile.ProfileScreen
 import com.karinca.app.ui.profile.ProfileSetupScreen
 import com.karinca.app.ui.transactions.AddTransactionScreen
@@ -131,6 +132,7 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
             ProfileScreen(
                 onSignedOut = { navController.navigateToPostAuth(KarincaRoute.Welcome) },
                 onOpenProfileSetup = { navController.navigate(KarincaRoute.ProfileSetup) },
+                onOpenKumbara = { navController.navigate(KarincaRoute.Kumbaram) },
                 onNavigateHome = { navController.navigateToTab(KarincaRoute.Home) },
                 onNavigateGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onNavigateReports = { navController.navigateToTab(KarincaRoute.Analysis) },
@@ -143,6 +145,9 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onBack = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() },
             )
+        }
+        composable<KarincaRoute.Kumbaram> {
+            KumbaramScreen(onBack = { navController.popBackStack() })
         }
         composable<KarincaRoute.Goals> {
             GoalsScreen(

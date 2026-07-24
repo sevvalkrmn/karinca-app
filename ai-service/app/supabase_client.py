@@ -5,6 +5,7 @@ single user's weekly transaction volume is tiny and this keeps every query a pla
 PostgREST select/filter with no stored procedures to maintain.
 """
 
+import uuid
 from datetime import date, datetime, timezone
 
 from supabase import Client, create_client
@@ -87,6 +88,70 @@ class SupabaseGateway:
         self._client.table("weekly_reports").update(
             {"narration": narration, "updated_at": _now_iso()}
         ).eq("id", report_id).execute()
+
+    # ---------- monthly income / Kumbara ----------
+
+    def fetch_all_profiles(self) -> list[dict]:
+        """Every profile, no KVKK gate — auto-income generation isn't LLM-related,
+        so it doesn't need the consent gate the weekly report does."""
+        return self._client.table("profiles").select("*").execute().data
+
+    def fetch_total_expense(self, user_id: str, from_date: date, to_date: date) -> float:
+        rows = (
+            self._client.table("transactions")
+            .select("amount")
+            .eq("user_id", user_id)
+            .eq("type", "expense")
+            .is_("deleted_at", "null")
+            .gte("occurred_at", from_date.isoformat())
+            .lte("occurred_at", to_date.isoformat())
+            .execute()
+            .data
+        )
+        return sum(row["amount"] for row in rows)
+
+    def ensure_auto_income_transaction(
+        self, transaction_id: str, user_id: str, category_id: str, amount: float, occurred_at: date
+    ) -> bool:
+        """Returns True only if this call actually inserted the row — False if it
+        already existed (deterministic id from the caller makes this check exact,
+        not just best-effort)."""
+        existing = self._client.table("transactions").select("id").eq("id", transaction_id).execute().data
+        if existing:
+            return False
+        now = _now_iso()
+        self._client.table("transactions").insert(
+            {
+                "id": transaction_id,
+                "user_id": user_id,
+                "category_id": category_id,
+                "type": "income",
+                "amount": amount,
+                "occurred_at": occurred_at.isoformat(),
+                "source": "auto_monthly_income",
+                "created_at": now,
+                "updated_at": now,
+            }
+        ).execute()
+        return True
+
+    def insert_piggy_bank_entry(self, user_id: str, amount: float, reason: str) -> None:
+        now = _now_iso()
+        self._client.table("piggy_bank_entries").insert(
+            {
+                "id": str(uuid.uuid4()),
+                "user_id": user_id,
+                "amount": amount,
+                "reason": reason,
+                "created_at": now,
+                "updated_at": now,
+            }
+        ).execute()
+
+    def update_last_auto_income_month(self, user_id: str, month: date) -> None:
+        self._client.table("profiles").update(
+            {"last_auto_income_month": month.isoformat()}
+        ).eq("id", user_id).execute()
 
 
 def _now_iso() -> str:

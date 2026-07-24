@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,9 +60,16 @@ import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.MascotWaveVideo
 import com.karinca.app.ui.components.PrimaryButton
+import java.text.NumberFormat
+import java.util.Locale
 
 private val PillShape = RoundedCornerShape(percent = 50)
+
+private val turkishCurrencyFormat: NumberFormat by lazy {
+    NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+}
 
 @Composable
 fun AddTransactionScreen(
@@ -75,12 +83,18 @@ fun AddTransactionScreen(
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var pendingOverage by remember { mutableStateOf<Double?>(null) }
 
     LaunchedEffect(transactionId, presetCategoryId) {
         viewModel.initialize(transactionId, presetCategoryId)
     }
     LaunchedEffect(Unit) {
-        viewModel.events.collect { onSaved() }
+        viewModel.events.collect { event ->
+            when (event) {
+                AddTransactionEvent.Saved, AddTransactionEvent.Deleted -> onSaved()
+                is AddTransactionEvent.ConfirmOverspend -> pendingOverage = event.overage
+            }
+        }
     }
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
@@ -248,7 +262,55 @@ fun AddTransactionScreen(
                 },
             )
         }
+
+        pendingOverage?.let { overage ->
+            OverspendWarningDialog(
+                overage = overage,
+                onConfirm = {
+                    viewModel.confirmSaveDespiteOverspend()
+                    pendingOverage = null
+                },
+                onDismiss = {
+                    viewModel.dismissOverspendWarning()
+                    pendingOverage = null
+                },
+            )
+        }
     }
+}
+
+@Composable
+private fun OverspendWarningDialog(overage: Double, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Bu ayki limitini aştın", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    modifier = Modifier.size(120.dp),
+                ) {
+                    MascotWaveVideo(rawResId = R.raw.karinca_sad)
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    "Bu ayki limitinin tamamını harcadın. Bu harcamanın ${turkishCurrencyFormat.format(overage)}'lik kısmı Kumbaranından düşülecek. Yine de devam etmek istiyor musun?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) { Text("Devam Et") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Vazgeç") }
+        },
+    )
 }
 
 @Composable

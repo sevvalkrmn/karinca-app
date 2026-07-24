@@ -55,9 +55,13 @@ class GoalsViewModel @Inject constructor(
 
     private val userId = authRepository.currentUserIdOrNull()
 
-    val goals: StateFlow<List<GoalEntity>> =
+    // null means "not loaded yet" — distinct from an empty list, which means "loaded, and
+    // there really are no goals." Without this distinction the screen would show the empty
+    // state's mascot/copy for a beat on every open before Room's first real emission
+    // arrives, even when goals already exist.
+    val goals: StateFlow<List<GoalEntity>?> =
         (userId?.let(goalRepository::observeActive) ?: flowOf(emptyList()))
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _events = MutableSharedFlow<GoalsEvent>()
     val events: SharedFlow<GoalsEvent> = _events.asSharedFlow()
@@ -158,7 +162,7 @@ class GoalsViewModel @Inject constructor(
         val income = transactionRepository.observeAllTimeTotal(userId, CategoryKind.INCOME).first()
         val expense = transactionRepository.observeAllTimeTotal(userId, CategoryKind.EXPENSE).first()
         val balance = income - expense
-        val reserved = goals.value.sumOf { it.pacedAmount(today) } + proposedGoal.pacedAmount(today)
+        val reserved = goals.value.orEmpty().sumOf { it.pacedAmount(today) } + proposedGoal.pacedAmount(today)
         return balance - reserved < 0.0
     }
 }

@@ -10,12 +10,14 @@ import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
+import com.karinca.app.data.local.dao.PiggyBankEntryDao
 import com.karinca.app.data.local.dao.ProfileDao
 import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
 import com.karinca.app.data.remote.dto.CategoryDto
 import com.karinca.app.data.remote.dto.ConsentDto
 import com.karinca.app.data.remote.dto.GoalDto
+import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
 import com.karinca.app.data.remote.dto.TransactionDto
 import com.karinca.app.data.remote.dto.WeeklyReportDto
@@ -45,6 +47,7 @@ class SyncWorker @AssistedInject constructor(
     private val transactionDao: TransactionDao,
     private val weeklyReportDao: WeeklyReportDao,
     private val goalDao: GoalDao,
+    private val piggyBankEntryDao: PiggyBankEntryDao,
     private val cursorStore: SyncCursorStore,
 ) : CoroutineWorker(context, params) {
 
@@ -58,6 +61,7 @@ class SyncWorker @AssistedInject constructor(
             pullTransactions()
             pullWeeklyReports()
             pullGoals()
+            pullPiggyBankEntries()
             Log.d(TAG, "Sync succeeded")
             Result.success()
         } catch (e: Exception) {
@@ -93,6 +97,10 @@ class SyncWorker @AssistedInject constructor(
                     SyncTable.GOALS.remoteName -> {
                         val row = goalDao.get(entry.entityId) ?: continue
                         postgrest.from(SyncTable.GOALS.remoteName).upsert(row.toDto())
+                    }
+                    SyncTable.PIGGY_BANK_ENTRIES.remoteName -> {
+                        val row = piggyBankEntryDao.get(entry.entityId) ?: continue
+                        postgrest.from(SyncTable.PIGGY_BANK_ENTRIES.remoteName).upsert(row.toDto())
                     }
                 }
                 outboxDao.remove(entry.tableName, entry.entityId)
@@ -182,6 +190,7 @@ class SyncWorker @AssistedInject constructor(
             }
             .decodeList<WeeklyReportDto>()
 
+        Log.d(TAG, "pullWeeklyReports: cursor=$cursor fetched=${rows.size}")
         for (dto in rows) {
             // Read-only mirror: no local-write-wins comparison needed, no outbox entry to clear.
             weeklyReportDao.upsertAll(listOf(dto.toEntity()))
@@ -205,6 +214,23 @@ class SyncWorker @AssistedInject constructor(
             dto.serverUpdatedAt?.let { maxSeen = maxOf(maxSeen, parseInstant(it)) }
         }
         if (maxSeen > cursor) cursorStore.advance(SyncTable.GOALS, maxSeen)
+    }
+
+    private suspend fun pullPiggyBankEntries() {
+        val cursor = cursorStore.get(SyncTable.PIGGY_BANK_ENTRIES)
+        var maxSeen = cursor
+        val rows = postgrest.from(SyncTable.PIGGY_BANK_ENTRIES.remoteName)
+            .select {
+                filter { gt("server_updated_at", cursor.toString()) }
+                order("server_updated_at", Order.ASCENDING)
+            }
+            .decodeList<PiggyBankEntryDto>()
+
+        for (dto in rows) {
+            mergePiggyBankEntry(dto)
+            dto.serverUpdatedAt?.let { maxSeen = maxOf(maxSeen, parseInstant(it)) }
+        }
+        if (maxSeen > cursor) cursorStore.advance(SyncTable.PIGGY_BANK_ENTRIES, maxSeen)
     }
 
     // Pull-side conflict resolution: only overwrite the local row if the incoming
@@ -255,5 +281,15 @@ class SyncWorker @AssistedInject constructor(
             goalDao.upsert(dto.toEntity())
             outboxDao.remove(SyncTable.GOALS.remoteName, dto.id)
         }
+    }
+
+    // Append-only ledger — a row's content never changes once created (no update
+    // policy exists), so there's no "which version wins" question, just an idempotent
+    // upsert. Clearing the outbox entry here is a defensive no-op in the normal case
+    // (push already cleared it) and a safety net if push succeeded but the local
+    // outbox removal somehow didn't.
+    private suspend fun mergePiggyBankEntry(dto: PiggyBankEntryDto) {
+        piggyBankEntryDao.upsert(dto.toEntity())
+        outboxDao.remove(SyncTable.PIGGY_BANK_ENTRIES.remoteName, dto.id)
     }
 }

@@ -24,12 +24,22 @@ data class CategoryTotalWithInfo(
     val percent: Double,
 )
 
+data class CategoryComparison(
+    val category: CategoryEntity,
+    val currentTotal: Double,
+    val previousTotal: Double,
+)
+
 data class AnalysisUiState(
     val period: ComparisonPeriod = ComparisonPeriod.WEEK,
     val total: Double = 0.0,
+    val previousTotal: Double = 0.0,
     // null when there's no prior-period data to compare against (avoids a misleading 0%).
     val trendPercent: Double? = null,
     val categoryTotals: List<CategoryTotalWithInfo> = emptyList(),
+    // Every category with spend in either period, sorted by this period's total —
+    // powers the "Bu Hafta vs Geçen Hafta" (or Ay) comparison table.
+    val categoryComparisons: List<CategoryComparison> = emptyList(),
 )
 
 @HiltViewModel
@@ -53,9 +63,10 @@ class AnalysisViewModel @Inject constructor(
                 combine(
                     categoryRepository.observeSelectable(uid),
                     transactionRepository.observeCategoryTotals(uid, CategoryKind.EXPENSE, current.from, current.to),
+                    transactionRepository.observeCategoryTotals(uid, CategoryKind.EXPENSE, previous.from, previous.to),
                     transactionRepository.observeTotal(uid, CategoryKind.EXPENSE, current.from, current.to),
                     transactionRepository.observeTotal(uid, CategoryKind.EXPENSE, previous.from, previous.to),
-                ) { categories, categoryTotals, total, previousTotal ->
+                ) { categories, categoryTotals, previousCategoryTotals, total, previousTotal ->
                     val categoryById = categories.associateBy { it.id }
                     val breakdown = categoryTotals
                         .mapNotNull { ct ->
@@ -70,7 +81,29 @@ class AnalysisViewModel @Inject constructor(
                         }
                         .sortedByDescending { it.total }
                     val trend = if (previousTotal > 0) (total - previousTotal) / previousTotal * 100.0 else null
-                    AnalysisUiState(period = period, total = total, trendPercent = trend, categoryTotals = breakdown)
+
+                    val currentByCategory = categoryTotals.associateBy { it.categoryId }
+                    val previousByCategory = previousCategoryTotals.associateBy { it.categoryId }
+                    val comparisons = (currentByCategory.keys + previousByCategory.keys)
+                        .distinct()
+                        .mapNotNull { categoryId -> categoryById[categoryId] }
+                        .map { category ->
+                            CategoryComparison(
+                                category = category,
+                                currentTotal = currentByCategory[category.id]?.total ?: 0.0,
+                                previousTotal = previousByCategory[category.id]?.total ?: 0.0,
+                            )
+                        }
+                        .sortedByDescending { it.currentTotal }
+
+                    AnalysisUiState(
+                        period = period,
+                        total = total,
+                        previousTotal = previousTotal,
+                        trendPercent = trend,
+                        categoryTotals = breakdown,
+                        categoryComparisons = comparisons,
+                    )
                 }
             }
         }

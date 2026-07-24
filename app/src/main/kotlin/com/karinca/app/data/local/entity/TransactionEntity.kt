@@ -28,6 +28,9 @@ data class TransactionEntity(
     val amount: Double,
     val occurredAt: LocalDate,
     val note: String?,
+    // Null for every normal manually-logged transaction; only "auto_monthly_income" for
+    // the server-generated salary row the AI service's monthly job creates.
+    val source: String? = null,
     val createdAt: Instant,
     val updatedAt: Instant,
     val deletedAt: Instant?,

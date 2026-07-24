@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.R
-import com.karinca.app.data.local.CoachTone
 import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.ui.components.KarincaBottomBar
 import com.karinca.app.ui.components.KarincaWordmark
@@ -43,12 +42,6 @@ import java.util.Locale
 
 private val reportDateFormat: DateTimeFormatter by lazy {
     DateTimeFormatter.ofPattern("d MMMM", Locale("tr", "TR"))
-}
-
-private fun CoachTone.label(): String = when (this) {
-    CoachTone.GENTLE -> "Nazik"
-    CoachTone.BALANCED -> "Dengeli"
-    CoachTone.BRUTAL -> "Sert"
 }
 
 @Composable
@@ -162,18 +155,6 @@ private fun ReportContent(report: WeeklyReportEntity, modifier: Modifier = Modif
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(Modifier.height(16.dp))
-                Surface(
-                    shape = RoundedCornerShape(percent = 50),
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                ) {
-                    Text(
-                        "${report.coachToneUsed.label()} ton",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    )
-                }
             }
         }
         Spacer(Modifier.height(24.dp))

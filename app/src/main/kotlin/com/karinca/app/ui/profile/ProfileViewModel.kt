@@ -3,13 +3,15 @@ package com.karinca.app.ui.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
+import com.karinca.app.data.repository.PiggyBankRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,23 +19,28 @@ import javax.inject.Inject
 data class ProfileUiState(
     val fullName: String?,
     val email: String?,
+    val piggyBankBalance: Double = 0.0,
 )
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    piggyBankRepository: PiggyBankRepository,
 ) : ViewModel() {
 
     // authRepository.state re-emits whenever the Supabase session changes — including
     // after AuthRepository.updateFullName() — so this re-reads the name instead of
     // freezing it at whatever it was when the ViewModel was first created.
-    val uiState: StateFlow<ProfileUiState> = authRepository.state
-        .map {
-            ProfileUiState(
-                fullName = authRepository.currentUserFullNameOrNull(),
-                email = authRepository.currentUserEmailOrNull(),
-            )
-        }
+    val uiState: StateFlow<ProfileUiState> = combine(
+        authRepository.state,
+        authRepository.currentUserIdOrNull()?.let(piggyBankRepository::observeBalance) ?: flowOf(0.0),
+    ) { _, balance ->
+        ProfileUiState(
+            fullName = authRepository.currentUserFullNameOrNull(),
+            email = authRepository.currentUserEmailOrNull(),
+            piggyBankBalance = balance,
+        )
+    }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

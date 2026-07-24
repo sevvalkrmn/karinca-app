@@ -2,16 +2,19 @@ package com.karinca.app.data.remote
 
 import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.CoachTone
+import com.karinca.app.data.local.PiggyBankEntryReason
 import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.local.entity.ConsentEntity
 import com.karinca.app.data.local.entity.GoalEntity
+import com.karinca.app.data.local.entity.PiggyBankEntryEntity
 import com.karinca.app.data.local.entity.ProfileEntity
 import com.karinca.app.data.local.entity.TransactionEntity
 import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.data.remote.dto.CategoryDto
 import com.karinca.app.data.remote.dto.ConsentDto
 import com.karinca.app.data.remote.dto.GoalDto
+import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
 import com.karinca.app.data.remote.dto.TransactionDto
 import com.karinca.app.data.remote.dto.WeeklyReportDto
@@ -99,6 +102,7 @@ fun TransactionDto.toEntity() = TransactionEntity(
     amount = amount,
     occurredAt = LocalDate.parse(occurredAt),
     note = note,
+    source = source,
     createdAt = parseInstant(createdAt),
     updatedAt = parseInstant(updatedAt),
     deletedAt = deletedAt?.let(::parseInstant),
@@ -112,6 +116,7 @@ fun TransactionEntity.toDto() = TransactionDto(
     amount = amount,
     occurredAt = occurredAt.toString(),
     note = note,
+    source = source,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
     deletedAt = deletedAt?.toString(),
@@ -160,4 +165,22 @@ fun WeeklyReportDto.toEntity() = WeeklyReportEntity(
     profileSnapshotJson = Json.encodeToString(JsonElement.serializer(), profileSnapshot),
     createdAt = parseInstant(createdAt),
     updatedAt = parseInstant(updatedAt),
+)
+
+fun PiggyBankEntryDto.toEntity() = PiggyBankEntryEntity(
+    id = id,
+    userId = userId,
+    amount = amount,
+    reason = PiggyBankEntryReason.fromValue(reason),
+    createdAt = parseInstant(createdAt),
+    updatedAt = parseInstant(updatedAt),
+)
+
+fun PiggyBankEntryEntity.toDto() = PiggyBankEntryDto(
+    id = id,
+    userId = userId,
+    amount = amount,
+    reason = reason.value,
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString(),
 )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +37,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -110,6 +113,18 @@ fun AnalysisScreen(
             }
             items(uiState.categoryTotals, key = { it.category.id }) { entry ->
                 CategoryRow(entry, onClick = { onCategoryClick(entry.category.id) })
+            }
+            item {
+                PeriodComparisonCard(
+                    period = uiState.period,
+                    currentTotal = uiState.total,
+                    previousTotal = uiState.previousTotal,
+                )
+            }
+            if (uiState.categoryComparisons.isNotEmpty()) {
+                item {
+                    CategoryComparisonCard(comparisons = uiState.categoryComparisons)
+                }
             }
         }
     }
@@ -273,5 +288,151 @@ private fun CategoryRow(entry: CategoryTotalWithInfo, onClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
+    }
+}
+
+@Composable
+private fun PeriodComparisonCard(period: ComparisonPeriod, currentTotal: Double, previousTotal: Double) {
+    val (currentLabel, previousLabel) = if (period == ComparisonPeriod.WEEK) {
+        "Bu Hafta" to "Geçen Hafta"
+    } else {
+        "Bu Ay" to "Geçen Ay"
+    }
+    val maxValue = maxOf(currentTotal, previousTotal).coerceAtLeast(1.0)
+    val barAreaHeight = 120.dp
+
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLowest,
+        shadowElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                "$currentLabel – $previousLabel",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(20.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(32.dp), modifier = Modifier.fillMaxWidth()) {
+                ComparisonBar(
+                    amount = currentTotal,
+                    fraction = (currentTotal / maxValue).toFloat(),
+                    color = MaterialTheme.colorScheme.primary,
+                    label = currentLabel,
+                    barAreaHeight = barAreaHeight,
+                    modifier = Modifier.weight(1f),
+                )
+                ComparisonBar(
+                    amount = previousTotal,
+                    fraction = (previousTotal / maxValue).toFloat(),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
+                    label = previousLabel,
+                    barAreaHeight = barAreaHeight,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ComparisonBar(
+    amount: Double,
+    fraction: Float,
+    color: Color,
+    label: String,
+    barAreaHeight: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+        Text(
+            turkishCurrencyFormat.format(amount),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(Modifier.height(8.dp))
+        Box(
+            modifier = Modifier.fillMaxWidth(0.6f).height(barAreaHeight),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(fraction.coerceIn(0.04f, 1f))
+                    .background(color, RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun CategoryComparisonCard(comparisons: List<CategoryComparison>) {
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLowest,
+        shadowElevation = 2.dp,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                "Kategori Karşılaştırması",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(16.dp))
+            comparisons.forEachIndexed { index, comparison ->
+                CategoryComparisonRow(comparison)
+                if (index != comparisons.lastIndex) Spacer(Modifier.height(14.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryComparisonRow(comparison: CategoryComparison) {
+    val tint = comparison.category.color.toComposeColor()
+    val delta = comparison.currentTotal - comparison.previousTotal
+
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier.size(36.dp).background(tint.copy(alpha = 0.15f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(categoryIcon(comparison.category.icon), contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        Text(
+            comparison.category.name,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            turkishCurrencyFormat.format(comparison.previousTotal),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (delta != 0.0) {
+            Spacer(Modifier.width(6.dp))
+            Icon(
+                if (delta > 0) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward,
+                contentDescription = null,
+                tint = if (delta > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.size(14.dp),
+            )
+        }
+        Spacer(Modifier.width(6.dp))
+        Text(
+            turkishCurrencyFormat.format(comparison.currentTotal),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }

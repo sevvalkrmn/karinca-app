@@ -30,3 +30,17 @@ enum class CategoryKind(val value: String) {
         fun fromValue(value: String): CategoryKind = entries.first { it.value == value }
     }
 }
+
+enum class PiggyBankEntryReason(val value: String) {
+    // Immediate deposit the moment the auto-generated monthly salary transaction
+    // lands, when regularMonthlyIncome exceeds the profile's LIMIT reference.
+    SALARY_LIMIT_DIFF("salary_limit_diff"),
+    // Deposit swept in at month's end when actual spending came in under the limit.
+    MONTHLY_LEFTOVER("monthly_leftover"),
+    // Withdrawal recorded when the user confirms spending past this month's limit.
+    OVERSPEND_WITHDRAWAL("overspend_withdrawal");
+
+    companion object {
+        fun fromValue(value: String): PiggyBankEntryReason = entries.first { it.value == value }
+    }
+}

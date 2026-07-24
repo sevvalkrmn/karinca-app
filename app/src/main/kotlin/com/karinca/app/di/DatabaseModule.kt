@@ -7,6 +7,7 @@ import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
+import com.karinca.app.data.local.dao.PiggyBankEntryDao
 import com.karinca.app.data.local.dao.ProfileDao
 import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
@@ -48,6 +49,9 @@ object DatabaseModule {
 
     @Provides
     fun provideGoalDao(db: KarincaDatabase): GoalDao = db.goalDao()
+
+    @Provides
+    fun providePiggyBankEntryDao(db: KarincaDatabase): PiggyBankEntryDao = db.piggyBankEntryDao()
 
     @Provides
     fun provideOutboxDao(db: KarincaDatabase): OutboxDao = db.outboxDao()
