@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Karınca - Kategoriler</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#eed4d0",
+            "on-tertiary-fixed-variant": "#653e00",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#4edea3",
+            "inverse-on-surface": "#ffedea",
+            "on-error": "#ffffff",
+            "primary-container": "#d0432d",
+            "on-surface": "#261816",
+            "on-primary-container": "#fffbff",
+            "on-surface-variant": "#5a413c",
+            "tertiary-fixed": "#ffddb8",
+            "error": "#ba1a1a",
+            "on-primary-fixed-variant": "#8f1203",
+            "inverse-surface": "#3c2d2a",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#3f0200",
+            "tertiary": "#825100",
+            "surface-tint": "#b12c19",
+            "primary-fixed": "#ffdad4",
+            "on-primary": "#ffffff",
+            "background": "#fff8f6",
+            "secondary-fixed": "#6ffbbe",
+            "primary-fixed-dim": "#ffb4a6",
+            "surface-variant": "#f7ddd8",
+            "on-background": "#261816",
+            "on-secondary-fixed": "#002113",
+            "tertiary-container": "#a36700",
+            "on-tertiary-fixed": "#2a1700",
+            "error-container": "#ffdad6",
+            "surface-container-low": "#fff0ee",
+            "surface-container": "#ffe9e5",
+            "on-secondary-container": "#00714d",
+            "outline": "#8e706b",
+            "surface-bright": "#fff8f6",
+            "primary": "#ae2a17",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed-variant": "#005236",
+            "inverse-primary": "#ffb4a6",
+            "surface-container-highest": "#f7ddd8",
+            "secondary": "#006c49",
+            "outline-variant": "#e2bfb8",
+            "tertiary-fixed-dim": "#ffb95f",
+            "on-tertiary-container": "#fffbff",
+            "surface": "#fff8f6",
+            "secondary-container": "#6cf8bb",
+            "surface-container-high": "#fde2de",
+            "on-error-container": "#93000a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "2xl": "48px",
+            "lg": "24px",
+            "md": "16px",
+            "3xl": "64px",
+            "sm": "8px",
+            "xs": "4px",
+            "container-margin": "20px",
+            "xl": "32px",
+            "base": "4px",
+            "gutter": "16px"
+          },
+          "fontFamily": {
+            "display-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+            "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .category-card:active {
+      transform: scale(0.95);
+      transition: transform 0.2s ease-in-out;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-on-background flex justify-between items-center w-full px-container-margin py-md sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<button class="active:scale-95 duration-200 ease-in-out hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim tracking-tight">Kategoriler</h1>
+</div>
+<div class="relative w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img alt="Karınca" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCt65yLMkSbKHgyfTiaXLjzhGhqugLSI3ZNxuEErEvCPa8MGQggGy1LFu0dunwxqxZ_2ALDf6VcpZuFLzdhOtryq_Ds8FGvPf8sjr-Wm6nUfHejgyvkn585gBAu4wbwonlxKuqXD01uyGJnqrl-W-OrLEaqgSk1Bl6qoMskbq_iZoAue_8on3V03TVP4eIOd2UIrpaYf1zQ7mPTw2rXJsaaizroExCcLs-hPMNy-EL9dAtUKmWG_2M1JRXwPEGJXwPmVcQ"/>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="w-full max-w-md px-container-margin py-lg pb-32 flex-grow overflow-y-auto scrollbar-hide">
+<!-- Decorative Brand Section -->
+<div class="mb-xl flex items-center justify-between bg-surface-container-low rounded-xl p-md shadow-sm">
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Bütçeni yönet</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">Yeni Harcama</h2>
+</div>
+<div class="w-16 h-16 opacity-80">
+<img alt="Ant Mascot" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI_LOlKVnkH6U9mu0OBbUexwB-OTnpCKIdJNjs5S8rY-yXLW8Ad8spzcqOMwCoehiQ7RFUS1Tsd6skITm0llaPh-vvczzKBayHBwjWVCqUlVYCF4M2TL5Zox7OY8E1wdjsyCpjnNXBmw8EsoO81cLdOk-Cj3AQlhSATpynsAl4zLXZZfjq78wM1SF6Tm8g8aiCtScMiouQe0Tg4nXG7EUc84eauuctVpKam6u1T3IQe56RreKoM8niTxOVC-976Pj_FPs"/>
+</div>
+</div>
+<!-- Category Grid -->
+<div class="grid grid-cols-2 gap-md">
+<!-- Yemek (Food) -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary text-[28px]">restaurant</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Yemek</span>
+</div>
+<!-- Market -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-secondary text-[28px]">shopping_cart</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Market</span>
+</div>
+<!-- Ulaşım -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-tertiary text-[28px]">directions_bus</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Ulaşım</span>
+</div>
+<!-- Eğlence -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-error text-[28px]">movie</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Eğlence</span>
+</div>
+<!-- Sağlık -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-on-secondary-container text-[28px]">medical_services</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Sağlık</span>
+</div>
+<!-- Eğitim -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-on-primary-fixed-variant text-[28px]">school</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Eğitim</span>
+</div>
+<!-- Faturalar -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-surface-dim flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[28px]">payments</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Faturalar</span>
+</div>
+<!-- Giyim -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed-dim flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant text-[28px]">checkroom</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Giyim</span>
+</div>
+<!-- Hediye -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed-dim flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-on-secondary-fixed-variant text-[28px]">redeem</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Hediye</span>
+</div>
+<!-- Diğer -->
+<div class="category-card bg-surface-container-lowest rounded-xl p-lg flex flex-col items-center justify-center gap-sm shadow-[0px_4px_20px_rgba(0,0,0,0.05)] border border-surface-variant cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-12 h-12 rounded-full bg-outline-variant flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-outline text-[28px]">more_horiz</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Diğer</span>
+</div>
+</div>
+<!-- Empty State Support Mascot (Subtle) -->
+<div class="mt-2xl flex flex-col items-center text-center px-lg">
+<img alt="Teşvik Edici Karınca" class="w-20 h-20 mb-md opacity-40 grayscale-[0.5]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDamuPyDCA1IqR8QXU3pZZvctqazaYlbVk9N51CXNPhVxenlg89euyvvnugSPp0Av87BAnDOgNp9uiIn8dtqySFfuKeNae4lX_NoA40NPI9If5TBowc6z84LUcfpU6rmlIIY8PX4HkQN0wNrrI4iajPE_mrbSqVPeAvqrZQXNSlD8xPHIXJpoU2yHgRB8FzU5mh3a-jPAZn0GXhVfghl_zq8Yep-j5xaovJOr3_IjqdaFB8pIeOwGhRNxUrm3LP_XY982g"/>
+<p class="font-body-md text-body-md text-on-surface-variant">Her kuruşun hesabını bilen karıncalar gibi büyüyoruz!</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] rounded-t-xl">
+<!-- Daily -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all active:scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined">savings</span>
+<span class="font-label-sm text-label-sm">Günlük</span>
+</a>
+<!-- Goals -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all active:scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined">stars</span>
+<span class="font-label-sm text-label-sm">Hedefler</span>
+</a>
+<!-- Overview -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-5 py-1 transition-all active:scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Genel Bakış</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-variant dark:hover:bg-on-secondary-fixed-variant transition-all active:scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-sm text-label-sm">Raporlar</span>
+</a>
+</nav>
+<!-- Interactions Script -->
+<script>
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.addEventListener('click', function() {
+        // Mock feedback
+        this.classList.add('bg-primary-fixed');
+        setTimeout(() => {
+          this.classList.remove('bg-primary-fixed');
+        }, 150);
+      });
+    });
+  </script>
+</body></html>

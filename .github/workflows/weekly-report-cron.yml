@@ -1,0 +1,20 @@
+name: Weekly AI Coach Report
+
+on:
+  schedule:
+    # 06:00 Europe/Istanbul (UTC+3) every Monday = 03:00 UTC.
+    - cron: "0 3 * * 1"
+  # Lets you trigger a run manually from the Actions tab, e.g. to test the deployed
+  # service without waiting for next Monday.
+  workflow_dispatch: {}
+
+jobs:
+  trigger-report-generation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call the weekly report generation endpoint
+        run: |
+          curl -sS -X POST "${{ secrets.AI_SERVICE_URL }}/internal/generate-weekly-reports" \
+            -H "X-Cron-Secret: ${{ secrets.REPORT_CRON_SECRET }}" \
+            --max-time 120 \
+            --fail

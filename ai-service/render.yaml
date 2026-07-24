@@ -1,0 +1,26 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Connect this repo on Render (New -> Blueprint) and it reads this file automatically.
+# Env vars marked `sync: false` are secrets — set their real values once in the Render
+# dashboard after the first deploy; they're never stored in this repo.
+
+services:
+  - type: web
+    name: karinca-ai-service
+    runtime: python
+    plan: free
+    rootDir: ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        value: openai
+      - key: LLM_MODEL
+        value: gpt-4o-mini
+      - key: REPORT_CRON_SECRET
+        sync: false

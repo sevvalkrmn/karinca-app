@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>karınca - Kategori Detayları</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-surface-variant": "#5a413c",
+                "primary-container": "#d0432d",
+                "on-tertiary": "#ffffff",
+                "tertiary-fixed-dim": "#ffb95f",
+                "on-tertiary-fixed-variant": "#653e00",
+                "on-primary-fixed-variant": "#8f1203",
+                "on-error-container": "#93000a",
+                "outline": "#8e706b",
+                "error-container": "#ffdad6",
+                "surface-tint": "#b12c19",
+                "surface": "#fff8f6",
+                "secondary-fixed-dim": "#4edea3",
+                "on-tertiary-container": "#fffbff",
+                "inverse-on-surface": "#ffedea",
+                "surface-container-high": "#fde2de",
+                "on-background": "#261816",
+                "on-surface": "#261816",
+                "on-secondary-container": "#00714d",
+                "inverse-surface": "#3c2d2a",
+                "primary-fixed-dim": "#ffb4a6",
+                "on-secondary-fixed-variant": "#005236",
+                "tertiary-fixed": "#ffddb8",
+                "primary-fixed": "#ffdad4",
+                "on-primary": "#ffffff",
+                "inverse-primary": "#ffb4a6",
+                "secondary-fixed": "#6ffbbe",
+                "surface-dim": "#eed4d0",
+                "surface-container-highest": "#f7ddd8",
+                "surface-container": "#ffe9e5",
+                "on-secondary-fixed": "#002113",
+                "surface-variant": "#f7ddd8",
+                "secondary-container": "#6cf8bb",
+                "on-primary-fixed": "#3f0200",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed": "#2a1700",
+                "on-primary-container": "#fffbff",
+                "background": "#fff8f6",
+                "surface-container-low": "#fff0ee",
+                "primary": "#ae2a17",
+                "secondary": "#006c49",
+                "tertiary-container": "#a36700",
+                "on-secondary": "#ffffff",
+                "on-error": "#ffffff",
+                "outline-variant": "#e2bfb8",
+                "error": "#ba1a1a",
+                "tertiary": "#825100",
+                "surface-bright": "#fff8f6"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "sm": "8px",
+                "lg": "24px",
+                "3xl": "64px",
+                "gutter": "16px",
+                "xs": "4px",
+                "2xl": "48px",
+                "base": "4px",
+                "md": "16px",
+                "xl": "32px",
+                "container-margin": "20px"
+            },
+            "fontFamily": {
+                "headline-lg": ["Plus Jakarta Sans"],
+                "display-lg": ["Plus Jakarta Sans"],
+                "headline-lg-mobile": ["Plus Jakarta Sans"],
+                "label-md": ["Plus Jakarta Sans"],
+                "body-lg": ["Plus Jakarta Sans"],
+                "label-sm": ["Plus Jakarta Sans"],
+                "headline-md": ["Plus Jakarta Sans"],
+                "body-md": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fff8f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .safe-area-inset-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        /* Custom scrollbar for transaction list */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .mascot-bg {
+            opacity: 0.03;
+            pointer-events: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- Top App Bar (Header) -->
+<header class="sticky top-0 z-50 bg-surface flex justify-between items-center w-full px-container-margin py-md">
+<div class="flex items-center gap-md">
+<button aria-label="Geri" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-container/10 flex items-center justify-center rounded-xl text-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Yemek</h1>
+</div>
+</div>
+<button aria-label="Ayarlar" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</header>
+<main class="flex-1 px-container-margin pb-32">
+<!-- Summary Card -->
+<section class="mt-lg">
+<div class="relative bg-surface-container-lowest rounded-2xl p-lg shadow-[0px_4px_20px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Subtle Mascot Background -->
+<div class="absolute -right-4 -bottom-4 w-32 h-32 mascot-bg">
+                    {{DATA:DOCUMENT:DOCUMENT_12}}
+                </div>
+<div class="relative z-10">
+<p class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">BU AY HARCANAN</p>
+<div class="flex items-baseline gap-xs mt-xs">
+<span class="font-display-lg text-[40px] leading-tight text-primary font-extrabold">1.240,50</span>
+<span class="font-headline-md text-headline-md text-primary">₺</span>
+</div>
+<div class="mt-lg">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-md text-label-md text-on-surface">Bütçe Durumu</span>
+<span class="font-label-md text-label-md text-secondary font-bold">759,50 ₺ kaldı</span>
+</div>
+<!-- Progress Bar -->
+<div class="h-4 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" style="width: 62%;"></div>
+</div>
+<div class="flex justify-between mt-xs">
+<span class="text-[10px] font-bold text-on-surface-variant">0 ₺</span>
+<span class="text-[10px] font-bold text-on-surface-variant">Hedef: 2.000 ₺</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Grid (Optional Extra Context) -->
+<section class="mt-xl grid grid-cols-2 gap-md">
+<div class="bg-surface-container-low rounded-2xl p-md flex flex-col gap-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">trending_up</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Geçen Aya Göre</span>
+<span class="font-headline-md text-headline-md text-primary-container">+12%</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-md flex flex-col gap-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">calendar_month</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Günlük Ortalama</span>
+<span class="font-headline-md text-headline-md text-secondary">41,35 ₺</span>
+</div>
+</section>
+<!-- Transaction List -->
+<section class="mt-xl">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Son İşlemler</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">Hepsini Gör</button>
+</div>
+<div class="space-y-sm">
+<!-- Transaction Item 1 -->
+<div class="bg-surface-container-lowest p-md rounded-2xl flex items-center justify-between hover:bg-surface-variant/20 transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">fastfood</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface leading-tight">Burger Keyfi</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Bugün, 12:45</p>
+</div>
+</div>
+<p class="font-body-lg text-body-lg font-bold text-primary">- 185,00 ₺</p>
+</div>
+<!-- Transaction Item 2 -->
+<div class="bg-surface-container-lowest p-md rounded-2xl flex items-center justify-between hover:bg-surface-variant/20 transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">local_cafe</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface leading-tight">Ant's Coffee</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Dün, 09:12</p>
+</div>
+</div>
+<p class="font-body-lg text-body-lg font-bold text-primary">- 65,00 ₺</p>
+</div>
+<!-- Transaction Item 3 -->
+<div class="bg-surface-container-lowest p-md rounded-2xl flex items-center justify-between hover:bg-surface-variant/20 transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_basket</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface leading-tight">Süper Market</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">14 Eyl, 18:30</p>
+</div>
+</div>
+<p class="font-body-lg text-body-lg font-bold text-primary">- 450,20 ₺</p>
+</div>
+<!-- Transaction Item 4 -->
+<div class="bg-surface-container-lowest p-md rounded-2xl flex items-center justify-between hover:bg-surface-variant/20 transition-all active:scale-[0.98] cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">restaurant_menu</span>
+</div>
+<div>
+<p class="font-body-lg text-body-lg text-on-surface leading-tight">Öğle Yemeği</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">13 Eyl, 13:15</p>
+</div>
+</div>
+<p class="font-body-lg text-body-lg font-bold text-primary">- 120,00 ₺</p>
+</div>
+</div>
+<!-- Empty state style hint with mascot (Hidden by default, shown if no items) -->
+<div class="hidden flex flex-col items-center justify-center py-xl text-center" id="empty-state">
+<div class="w-48 h-48 opacity-60 mb-md">
+                    {{DATA:DOCUMENT:DOCUMENT_12}}
+                </div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Henüz işlem yok.</p>
+<p class="font-label-sm text-label-sm text-outline mt-xs">Harcama ekleyerek başlayın!</p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 shadow-[0px_-4px_20px_rgba(0,0,0,0.05)] bg-surface-container-lowest rounded-t-xl">
+<!-- Daily -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant transition-all Active: scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="savings">savings</span>
+<span class="font-label-sm text-label-sm">Günlük</span>
+</a>
+<!-- Goals -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant transition-all Active: scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="stars">stars</span>
+<span class="font-label-sm text-label-sm">Hedefler</span>
+</a>
+<!-- Overview (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1 Active: scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Genel Bakış</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-variant transition-all Active: scale-90 duration-200 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-label-sm text-label-sm">Raporlar</span>
+</a>
+</nav>
+<!-- Floating Action Button (FAB) for adding new transaction in this category -->
+<button aria-label="Ekle" class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<script>
+        // Simple micro-interaction for list items
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.add('bg-surface-variant/30');
+                setTimeout(() => item.classList.remove('bg-surface-variant/30'), 150);
+            });
+        });
+    </script>
+</body></html>

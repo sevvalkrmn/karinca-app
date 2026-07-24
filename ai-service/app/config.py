@@ -1,0 +1,30 @@
+import os
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Settings:
+    supabase_url: str
+    supabase_service_role_key: str
+    llm_api_key: str
+    llm_provider: str
+    llm_model: str
+    report_cron_secret: str
+
+
+def load_settings() -> Settings:
+    return Settings(
+        supabase_url=_require("SUPABASE_URL"),
+        supabase_service_role_key=_require("SUPABASE_SERVICE_ROLE_KEY"),
+        llm_api_key=_require("LLM_API_KEY"),
+        llm_provider=os.environ.get("LLM_PROVIDER", "openai"),
+        llm_model=os.environ.get("LLM_MODEL", "gpt-4o-mini"),
+        report_cron_secret=_require("REPORT_CRON_SECRET"),
+    )
+
+
+def _require(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value

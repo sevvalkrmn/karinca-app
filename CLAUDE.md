@@ -16,7 +16,7 @@ Karınca ("ant" in Turkish) is an offline-first Android budgeting app for the Tu
 - **Auth:** Google sign-in + phone OTP (both common for the target user).
 - **Payments:** Google Play Billing via RevenueCat (freemium; Pro gates the AI weekly report).
 - **Compliance:** KVKK (Turkish data-protection law) is a Phase 1 design input — explicit consent for storing financial PII (Supabase EU region) and for sending aggregated summaries to the LLM provider.
-- **Typography:** Plus Jakarta Sans.
+- **Typography:** Inter (chosen for an SF Pro-like feel on Android, where SF Pro itself isn't distributable).
 
 ## Working Agreement — UI Division of Labor
 
