@@ -160,4 +160,5 @@ private fun PiggyBankEntryReason.label(): String = when (this) {
     PiggyBankEntryReason.MONTHLY_LEFTOVER -> "Ay sonu artan"
     PiggyBankEntryReason.OVERSPEND_WITHDRAWAL -> "Limit aşımı için kullanılan"
     PiggyBankEntryReason.OVERSPEND_REVERSAL -> "Silinen işlem için iade edilen"
+    PiggyBankEntryReason.MANUAL_DEPOSIT -> "Gelirden doğrudan eklenen"
 }

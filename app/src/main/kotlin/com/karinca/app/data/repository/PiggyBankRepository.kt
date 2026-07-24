@@ -41,6 +41,12 @@ class PiggyBankRepository @Inject constructor(
         insertEntry(userId, -amountToWithdraw, PiggyBankEntryReason.OVERSPEND_WITHDRAWAL, transactionId)
     }
 
+    // The user chose "Kumbaraya At" over "Mevcut Bütçeye Ekle" for a new income — no
+    // transaction is created for it, this deposit is the only record of that money.
+    suspend fun recordManualDeposit(userId: String, amount: Double) {
+        insertEntry(userId, amount, PiggyBankEntryReason.MANUAL_DEPOSIT, transactionId = null)
+    }
+
     // Called when a transaction is deleted — if it ever triggered an overspend
     // withdrawal, undoes it with a compensating deposit (the ledger is append-only;
     // the original withdrawal is never edited or removed). A no-op for the vast

@@ -84,6 +84,7 @@ fun AddTransactionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var pendingOverage by remember { mutableStateOf<Double?>(null) }
+    var pendingIncomeAmount by remember { mutableStateOf<Double?>(null) }
 
     LaunchedEffect(transactionId, presetCategoryId) {
         viewModel.initialize(transactionId, presetCategoryId)
@@ -93,6 +94,7 @@ fun AddTransactionScreen(
             when (event) {
                 AddTransactionEvent.Saved, AddTransactionEvent.Deleted -> onSaved()
                 is AddTransactionEvent.ConfirmOverspend -> pendingOverage = event.overage
+                is AddTransactionEvent.ConfirmIncomeDestination -> pendingIncomeAmount = event.amount
             }
         }
     }
@@ -276,6 +278,24 @@ fun AddTransactionScreen(
                 },
             )
         }
+
+        pendingIncomeAmount?.let { amount ->
+            IncomeDestinationDialog(
+                amount = amount,
+                onAddToBudget = {
+                    viewModel.confirmIncomeToBudget()
+                    pendingIncomeAmount = null
+                },
+                onAddToKumbara = {
+                    viewModel.confirmIncomeToKumbara()
+                    pendingIncomeAmount = null
+                },
+                onDismiss = {
+                    viewModel.dismissIncomeDestinationChoice()
+                    pendingIncomeAmount = null
+                },
+            )
+        }
     }
 }
 
@@ -309,6 +329,35 @@ private fun OverspendWarningDialog(overage: Double, onConfirm: () -> Unit, onDis
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Vazgeç") }
+        },
+    )
+}
+
+@Composable
+private fun IncomeDestinationDialog(
+    amount: Double,
+    onAddToBudget: () -> Unit,
+    onAddToKumbara: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("${turkishCurrencyFormat.format(amount)} nereye eklensin?", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        },
+        text = {
+            Text(
+                "Bu geliri harcanabilir bütçene mi eklemek istersin, yoksa doğrudan Kumbarana mı atmak istersin?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        },
+        confirmButton = {
+            Button(onClick = onAddToBudget) { Text("Mevcut Bütçeye Ekle") }
+        },
+        dismissButton = {
+            TextButton(onClick = onAddToKumbara) { Text("Kumbaraya At") }
         },
     )
 }

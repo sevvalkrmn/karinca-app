@@ -47,6 +47,9 @@ sealed interface AddTransactionEvent {
     // This new expense would push the month past the profile's LIMIT reference —
     // covering the overage from the Kumbara instead needs the user's confirmation first.
     data class ConfirmOverspend(val overage: Double) : AddTransactionEvent
+    // A brand-new income needs the user to say whether it should count toward the
+    // everyday spendable budget, or go straight into the Kumbara instead.
+    data class ConfirmIncomeDestination(val amount: Double) : AddTransactionEvent
 }
 
 @HiltViewModel
@@ -92,6 +95,9 @@ class AddTransactionViewModel @Inject constructor(
     private var editingOccurredAt: LocalDate = LocalDate.now()
     private var initialized = false
     private var pendingOverspendOverage: Double? = null
+    private var pendingIncomeSave: PendingIncomeSave? = null
+
+    private data class PendingIncomeSave(val categoryId: String, val amount: Double)
 
     // Called once from the screen's LaunchedEffect — Hilt ViewModels can't take
     // per-navigation arguments via constructor injection, so the route's optional args
@@ -149,8 +155,13 @@ class AddTransactionViewModel @Inject constructor(
         if (amount <= 0.0) return
 
         viewModelScope.launch {
-            // Only a brand-new expense can trigger this — editing an existing one skips
-            // it, since this month's totals already include whatever it used to be.
+            // Only a brand-new one of either type can trigger these — editing an
+            // existing transaction skips both, since it's already accounted for.
+            if (editingId == null && state.type == CategoryKind.INCOME) {
+                pendingIncomeSave = PendingIncomeSave(categoryId, amount)
+                _events.emit(AddTransactionEvent.ConfirmIncomeDestination(amount))
+                return@launch
+            }
             if (editingId == null && state.type == CategoryKind.EXPENSE) {
                 val overage = computeOverage(uid, amount)
                 if (overage > 0.0) {
@@ -176,6 +187,40 @@ class AddTransactionViewModel @Inject constructor(
 
     fun dismissOverspendWarning() {
         pendingOverspendOverage = null
+    }
+
+    // "Mevcut Bütçeye Ekle" — the normal path, an ordinary income transaction.
+    fun confirmIncomeToBudget() {
+        val pending = pendingIncomeSave ?: return
+        val uid = userId ?: return
+        pendingIncomeSave = null
+        viewModelScope.launch { performSave(uid, pending.categoryId, pending.amount, CategoryKind.INCOME) }
+    }
+
+    // "Kumbaraya At" — no transaction is created; the amount only ever exists as a
+    // Kumbara deposit, so it never counts toward the everyday spendable budget.
+    fun confirmIncomeToKumbara() {
+        val pending = pendingIncomeSave ?: return
+        val uid = userId ?: return
+        pendingIncomeSave = null
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+            try {
+                piggyBankRepository.recordManualDeposit(uid, pending.amount)
+                syncScheduler.requestImmediateSync()
+                _events.emit(AddTransactionEvent.Saved)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Kaydedilemedi, tekrar dener misin?") }
+            } finally {
+                _uiState.update { it.copy(isSaving = false) }
+            }
+        }
+    }
+
+    fun dismissIncomeDestinationChoice() {
+        pendingIncomeSave = null
     }
 
     // How much of THIS new expense would land outside the month's LIMIT reference —

@@ -41,7 +41,10 @@ enum class PiggyBankEntryReason(val value: String) {
     OVERSPEND_WITHDRAWAL("overspend_withdrawal"),
     // Compensating deposit when the transaction behind an OVERSPEND_WITHDRAWAL is
     // later deleted — the withdrawal itself is never edited/removed (append-only).
-    OVERSPEND_REVERSAL("overspend_reversal");
+    OVERSPEND_REVERSAL("overspend_reversal"),
+    // The user chose "Kumbaraya At" instead of "Mevcut Bütçeye Ekle" when logging a
+    // new income — no transaction is created for it, this deposit is the only record.
+    MANUAL_DEPOSIT("manual_deposit");
 
     companion object {
         fun fromValue(value: String): PiggyBankEntryReason = entries.first { it.value == value }
