@@ -38,6 +38,11 @@ class AppEntryViewModel @Inject constructor(
             val userId = authRepository.currentUserIdOrNull()
             val route = if (userId == null) {
                 KarincaRoute.Welcome
+            } else if (!authRepository.validateCurrentSessionOrSignOut()) {
+                // The cached session looked signed-in, but Supabase just rejected it
+                // outright (e.g. the account was deleted server-side) — signOut() has
+                // already wiped local data, so this is a real, fresh sign-out.
+                KarincaRoute.Welcome
             } else {
                 syncScheduler.requestImmediateSync()
                 // Silent here — GoalsViewModel runs the same check again (a no-op if

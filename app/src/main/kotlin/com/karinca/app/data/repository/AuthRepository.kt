@@ -9,6 +9,8 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.exceptions.RestException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -120,5 +122,31 @@ class AuthRepository @Inject constructor(
         auth.signOut()
         withContext(Dispatchers.IO) { database.clearAllTables() }
         cursorStore.resetAll()
+    }
+
+    // Cold-start-only check: a cached access token can still look "signed in" for up
+    // to its own lifetime even after the account behind it was deleted server-side,
+    // since token validity is checked locally first — this calls Supabase directly to
+    // confirm the account is still actually there. Only an explicit rejection (account
+    // gone) signs out; any other failure (offline, slow/unreachable server) leaves the
+    // cached session trusted, so a normal offline cold start is never punished for not
+    // being able to reach the network.
+    suspend fun validateCurrentSessionOrSignOut(): Boolean {
+        if (currentUserIdOrNull() == null) return true
+        return try {
+            auth.retrieveUserForCurrentSession()
+            true
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: RestException) {
+            if (e.statusCode == 401 || e.statusCode == 403 || e.statusCode == 404) {
+                signOut()
+                false
+            } else {
+                true
+            }
+        } catch (e: Exception) {
+            true
+        }
     }
 }
