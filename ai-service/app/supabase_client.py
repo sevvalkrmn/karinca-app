@@ -196,6 +196,22 @@ class SupabaseGateway:
             {"last_processed_month": month.isoformat()}
         ).eq("id", payment_id).execute()
 
+    # ---------- Pro entitlement ----------
+
+    def fetch_pro_user_ids(self) -> set[str]:
+        rows = self._client.table("entitlements").select("user_id").eq("is_pro", True).execute().data
+        return {row["user_id"] for row in rows}
+
+    def upsert_entitlement(self, user_id: str, is_pro: bool, revenuecat_customer_id: str) -> None:
+        self._client.table("entitlements").upsert(
+            {
+                "user_id": user_id,
+                "is_pro": is_pro,
+                "revenuecat_customer_id": revenuecat_customer_id,
+                "updated_at": _now_iso(),
+            }
+        ).execute()
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()

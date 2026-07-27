@@ -25,11 +25,16 @@ def generate_all_reports(gateway: SupabaseGateway, llm_api_key: str, llm_model: 
     week_start, week_end = last_completed_week(date.today())
 
     profiles = gateway.fetch_consented_profiles()
+    pro_user_ids = gateway.fetch_pro_user_ids()
     generated: list[str] = []
+    skipped_non_pro: list[str] = []
     failed: list[dict] = []
 
     for profile in profiles:
         user_id = profile["id"]
+        if user_id not in pro_user_ids:
+            skipped_non_pro.append(user_id)
+            continue
         try:
             facts = engine.compute_facts(user_id, profile, week_start, week_end)
             profile_snapshot = ProfileSnapshot(
@@ -69,5 +74,6 @@ def generate_all_reports(gateway: SupabaseGateway, llm_api_key: str, llm_model: 
         "week_start": week_start.isoformat(),
         "week_end": week_end.isoformat(),
         "generated": len(generated),
+        "skipped_non_pro": len(skipped_non_pro),
         "failed": failed,
     }

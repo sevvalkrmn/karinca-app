@@ -10,6 +10,9 @@ class Settings:
     llm_provider: str
     llm_model: str
     report_cron_secret: str
+    revenuecat_webhook_secret: str
+    revenuecat_secret_api_key: str
+    revenuecat_entitlement_id: str
 
 
 def load_settings() -> Settings:
@@ -20,6 +23,9 @@ def load_settings() -> Settings:
         llm_provider=os.environ.get("LLM_PROVIDER", "openai"),
         llm_model=os.environ.get("LLM_MODEL", "gpt-4o-mini"),
         report_cron_secret=_require("REPORT_CRON_SECRET"),
+        revenuecat_webhook_secret=_require("REVENUECAT_WEBHOOK_SECRET"),
+        revenuecat_secret_api_key=_require("REVENUECAT_SECRET_API_KEY"),
+        revenuecat_entitlement_id=os.environ.get("REVENUECAT_ENTITLEMENT_ID", "pro"),
     )
 
 
