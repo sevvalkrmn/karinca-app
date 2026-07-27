@@ -26,6 +26,7 @@ import com.karinca.app.ui.coach.WeeklyReportScreen
 import com.karinca.app.ui.consent.KvkkConsentScreen
 import com.karinca.app.ui.goals.GoalsScreen
 import com.karinca.app.ui.home.HomeScreen
+import com.karinca.app.ui.onboarding.OnboardingScreen
 import com.karinca.app.ui.profile.KumbaramScreen
 import com.karinca.app.ui.profile.ProfileScreen
 import com.karinca.app.ui.profile.ProfileSetupScreen
@@ -101,7 +102,12 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
         }
         composable<KarincaRoute.KvkkConsent> {
             KvkkConsentScreen(
-                onAccepted = { navController.navigateToPostAuth(KarincaRoute.Home) },
+                onAccepted = { navController.navigateToPostAuth(KarincaRoute.Onboarding) },
+            )
+        }
+        composable<KarincaRoute.Onboarding> {
+            OnboardingScreen(
+                onCompleted = { navController.navigateToPostAuth(KarincaRoute.Home) },
             )
         }
         composable<KarincaRoute.Home> {

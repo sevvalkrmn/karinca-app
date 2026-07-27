@@ -20,6 +20,9 @@ sealed interface KarincaRoute {
     data object KvkkConsent : KarincaRoute
 
     @Serializable
+    data object Onboarding : KarincaRoute
+
+    @Serializable
     data object Home : KarincaRoute
 
     @Serializable
