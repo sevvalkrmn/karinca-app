@@ -22,6 +22,7 @@ supabase/.temp/
 # ----- Android / Gradle / Kotlin -----
 *.iml
 .gradle/
+.kotlin/
 local.properties
 build/
 captures/
