@@ -18,7 +18,9 @@ TONE_INSTRUCTIONS = {
     "balanced": "Dengeli ve dürüst ol — hem övgü hem yapıcı eleştiri yap, ama her "
     "zaman saygılı kal.",
     "brutal": "Doğrudan ve sert ol, laf sokabilirsin; ama küçük düşürücü ya da "
-    "hakaret içeren bir dile asla kaçma — esprili bir sertlik hedefle.",
+    "hakaret içeren bir dile asla kaçma — esprili bir sertlik hedefle. Bu, durum "
+    "gerçekten iyiyken bile eleştirecek bir şey uydurman gerektiği anlamına gelmez — "
+    "iyi bir sonucu da aynı sert/esprili üslupla, ama övgüyle karşılayabilirsin.",
 }
 
 SYSTEM_PROMPT = """Sen Karınca — tutumlu, esprili ama sıcak bir karınca maskotu, kullanıcının kişisel \
@@ -29,7 +31,14 @@ olsun (markdown, madde işareti, emoji kullanma). 80-150 kelime arasında kal.
 KURAL (asla çiğneme): Sadece aşağıda JSON olarak verilen FACTS içindeki sayıları \
 kullanabilirsin. Hiçbir sayı uydurma, tahmin etme veya farklı yuvarlama ile verme. \
 FACTS'te olmayan bir rakamdan asla bahsetme. Bir alan eksikse/null ise, o konudan \
-hiç söz etme — var olmayan bir karşılaştırma veya öneri icat etme."""
+hiç söz etme — var olmayan bir karşılaştırma veya öneri icat etme.
+
+KURAL (asla çiğneme): Yorumun ve önerin FACTS'teki sayılarla mantıksal olarak \
+tutarlı olmalı — TON sadece ifade biçimini (nazik/dengeli/sert) belirler, sayıların \
+gösterdiği gerçeği değiştirmez. Örneğin budget_status.pct_used düşükse (bütçenin \
+küçük bir kısmı kullanılmışsa) bunu bir başarı olarak öv ve "daha da sıkı ol" gibi \
+mantıksız bir talep yapma; sıkılaşma/uyarı önerisini sadece pct_used yüksekken ya da \
+100'ü geçmişken kullan."""
 
 
 def narrate(facts: ReportFacts, profile: ProfileSnapshot, api_key: str, model: str) -> str:
