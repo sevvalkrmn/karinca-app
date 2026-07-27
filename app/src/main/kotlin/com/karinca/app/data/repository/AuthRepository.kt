@@ -1,5 +1,7 @@
 package com.karinca.app.data.repository
 
+import com.karinca.app.data.local.KarincaDatabase
+import com.karinca.app.data.sync.SyncCursorStore
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.providers.Google
@@ -7,8 +9,10 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -22,6 +26,8 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepository @Inject constructor(
     private val auth: Auth,
+    private val database: KarincaDatabase,
+    private val cursorStore: SyncCursorStore,
 ) {
     // Cold map over the plugin's StateFlow — a future ViewModel turns this into UI
     // state via stateIn(viewModelScope, ...), same as any other repository Flow here.
@@ -102,7 +108,17 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    // Local Room is a re-derivable sync cache, never the source of truth — so signing
+    // out must leave this device with nothing of the outgoing account still sitting on
+    // disk. Without this, the next sign-in here (same account on a second device
+    // catching up, or a different account on a previously-used device) would either see
+    // the outgoing account's leftover local rows, or — worse — silently skip pulling its
+    // own older rows because the sync cursors were still pointing at wherever the
+    // outgoing account's last sync left them. Wiping both means every sign-in always
+    // starts from a full pull straight from Supabase.
     suspend fun signOut() {
         auth.signOut()
+        withContext(Dispatchers.IO) { database.clearAllTables() }
+        cursorStore.resetAll()
     }
 }

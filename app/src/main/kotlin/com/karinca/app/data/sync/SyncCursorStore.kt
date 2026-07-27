@@ -44,4 +44,15 @@ class SyncCursorStore @Inject constructor(
             }
         }
     }
+
+    // Called on sign-out. Cursors are unscoped by user (one DataStore per device, not
+    // per account), so leaving a stale cursor behind after signing out would make the
+    // next sign-in on this device — same account or a different one — silently skip
+    // pulling any row whose server_updated_at falls before that leftover cursor. Reset
+    // to zero so the next sync after any sign-in is always a full pull.
+    suspend fun resetAll() {
+        dataStore.edit { prefs ->
+            SyncTable.entries.forEach { prefs.remove(keyFor(it)) }
+        }
+    }
 }

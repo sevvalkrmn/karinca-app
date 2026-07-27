@@ -22,8 +22,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -157,9 +155,6 @@ fun ProfileScreen(
                     subtitle = "Tekrar eden ödemelerini yönet",
                     onClick = onOpenSubscriptions,
                 )
-                // Not wired yet — their sub-screens don't exist in the Stitch hand-off.
-                ProfileMenuRow(Icons.Filled.Notifications, "Bildirim Ayarları", "Uyarıları ve hatırlatıcıları seç")
-                ProfileMenuRow(Icons.Filled.Palette, "Uygulama Teması", "Görünümü özelleştir")
                 ProfileMenuRow(
                     icon = Icons.Filled.Logout,
                     title = "Çıkış Yap",
