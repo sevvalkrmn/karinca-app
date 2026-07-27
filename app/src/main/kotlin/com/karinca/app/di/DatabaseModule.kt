@@ -9,6 +9,7 @@ import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.PiggyBankEntryDao
 import com.karinca.app.data.local.dao.ProfileDao
+import com.karinca.app.data.local.dao.RecurringPaymentDao
 import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
 import dagger.Module
@@ -52,6 +53,9 @@ object DatabaseModule {
 
     @Provides
     fun providePiggyBankEntryDao(db: KarincaDatabase): PiggyBankEntryDao = db.piggyBankEntryDao()
+
+    @Provides
+    fun provideRecurringPaymentDao(db: KarincaDatabase): RecurringPaymentDao = db.recurringPaymentDao()
 
     @Provides
     fun provideOutboxDao(db: KarincaDatabase): OutboxDao = db.outboxDao()

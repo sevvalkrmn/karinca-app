@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Notifications
@@ -56,6 +57,7 @@ fun ProfileScreen(
     onSignedOut: () -> Unit,
     onOpenProfileSetup: () -> Unit,
     onOpenKumbara: () -> Unit,
+    onOpenSubscriptions: () -> Unit,
     onNavigateHome: () -> Unit,
     onNavigateGoals: () -> Unit,
     onNavigateReports: () -> Unit,
@@ -148,6 +150,12 @@ fun ProfileScreen(
                     title = "Kumbaram",
                     subtitle = "${turkishCurrencyFormat.format(uiState.piggyBankBalance)} biriktin",
                     onClick = onOpenKumbara,
+                )
+                ProfileMenuRow(
+                    icon = Icons.Filled.Autorenew,
+                    title = "Abonelikler",
+                    subtitle = "Tekrar eden ödemelerini yönet",
+                    onClick = onOpenSubscriptions,
                 )
                 // Not wired yet — their sub-screens don't exist in the Stitch hand-off.
                 ProfileMenuRow(Icons.Filled.Notifications, "Bildirim Ayarları", "Uyarıları ve hatırlatıcıları seç")

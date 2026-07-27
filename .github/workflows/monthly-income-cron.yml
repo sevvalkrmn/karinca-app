@@ -1,4 +1,4 @@
-name: Monthly Auto Income + Kumbara Settlement
+name: Monthly Auto Income + Kumbara Settlement + Recurring Payments
 
 on:
   schedule:
@@ -15,6 +15,12 @@ jobs:
       - name: Call the monthly income processing endpoint
         run: |
           curl -sS -X POST "${{ secrets.AI_SERVICE_URL }}/internal/process-monthly-income" \
+            -H "X-Cron-Secret: ${{ secrets.REPORT_CRON_SECRET }}" \
+            --max-time 120 \
+            --fail
+      - name: Call the recurring payments processing endpoint
+        run: |
+          curl -sS -X POST "${{ secrets.AI_SERVICE_URL }}/internal/process-recurring-payments" \
             -H "X-Cron-Secret: ${{ secrets.REPORT_CRON_SECRET }}" \
             --max-time 120 \
             --fail

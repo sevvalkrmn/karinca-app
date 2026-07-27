@@ -11,4 +11,5 @@ enum class SyncTable(val remoteName: String) {
     WEEKLY_REPORTS("weekly_reports"),
     GOALS("goals"),
     PIGGY_BANK_ENTRIES("piggy_bank_entries"),
+    RECURRING_PAYMENTS("recurring_payments"),
 }

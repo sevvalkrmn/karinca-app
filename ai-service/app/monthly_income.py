@@ -8,21 +8,12 @@ month's salary transaction — there's exactly one process doing this, ever.
 """
 
 import uuid
-from datetime import date, timedelta
+from datetime import date
 
+from app.date_utils import add_month, month_end
 from app.supabase_client import SupabaseGateway
 
 DEFAULT_INCOME_CATEGORY_ID = "f7a0e280-296e-4b37-876a-89611afea4be"  # seeded "Maaş/Burs"
-
-
-def _add_month(d: date) -> date:
-    if d.month == 12:
-        return date(d.year + 1, 1, 1)
-    return date(d.year, d.month + 1, 1)
-
-
-def _month_end(d: date) -> date:
-    return _add_month(d) - timedelta(days=1)
 
 
 def process_monthly_income(gateway: SupabaseGateway) -> dict:
@@ -41,7 +32,7 @@ def process_monthly_income(gateway: SupabaseGateway) -> dict:
             reference_amount = profile.get("reference_amount")
 
             last_income_month_str = profile.get("last_auto_income_month")
-            month = _add_month(date.fromisoformat(last_income_month_str)) if last_income_month_str else current_month
+            month = add_month(date.fromisoformat(last_income_month_str)) if last_income_month_str else current_month
 
             while month <= current_month:
                 transaction_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{user_id}:auto_income:{month.isoformat()}"))
@@ -59,12 +50,12 @@ def process_monthly_income(gateway: SupabaseGateway) -> dict:
                 # Settle the month we're leaving, once it's fully in the past — its
                 # real expense total is now final.
                 if month < current_month and is_limit and reference_amount is not None:
-                    actual_expense = gateway.fetch_total_expense(user_id, month, _month_end(month))
+                    actual_expense = gateway.fetch_total_expense(user_id, month, month_end(month))
                     leftover = max(reference_amount - actual_expense, 0.0)
                     if leftover > 0:
                         gateway.insert_piggy_bank_entry(user_id, leftover, "monthly_leftover")
 
-                month = _add_month(month)
+                month = add_month(month)
 
             gateway.update_last_auto_income_month(user_id, current_month)
             processed.append(user_id)

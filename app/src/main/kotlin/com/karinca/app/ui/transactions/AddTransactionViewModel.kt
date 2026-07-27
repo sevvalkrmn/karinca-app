@@ -9,6 +9,7 @@ import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.CategoryRepository
 import com.karinca.app.data.repository.PiggyBankRepository
 import com.karinca.app.data.repository.ProfileRepository
+import com.karinca.app.data.repository.RecurringPaymentRepository
 import com.karinca.app.data.repository.TransactionRepository
 import com.karinca.app.data.sync.SyncScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,9 @@ data class AddTransactionUiState(
     val isSaving: Boolean = false,
     val isEditMode: Boolean = false,
     val errorMessage: String? = null,
+    // Only ever meaningful for a brand-new expense — hidden/reset for income and for edits.
+    val isRecurring: Boolean = false,
+    val recurringName: String = "",
 ) {
     val canSave: Boolean
         get() = selectedCategoryId != null && (amountText.replace(',', '.').toDoubleOrNull() ?: 0.0) > 0.0
@@ -59,6 +63,7 @@ class AddTransactionViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val profileRepository: ProfileRepository,
     private val piggyBankRepository: PiggyBankRepository,
+    private val recurringPaymentRepository: RecurringPaymentRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
 
@@ -128,6 +133,13 @@ class AddTransactionViewModel @Inject constructor(
     fun onTypeChange(type: CategoryKind) = _uiState.update { it.copy(type = type, selectedCategoryId = null) }
 
     fun onSelectCategory(categoryId: String) = _uiState.update { it.copy(selectedCategoryId = categoryId) }
+
+    // Unchecking clears the name too, so a stray leftover name can't linger if the
+    // user unchecks and rechecks later.
+    fun onRecurringToggle(checked: Boolean) =
+        _uiState.update { it.copy(isRecurring = checked, recurringName = if (checked) it.recurringName else "") }
+
+    fun onRecurringNameChange(name: String) = _uiState.update { it.copy(recurringName = name) }
 
     fun onDigit(digit: Char) {
         _uiState.update { state ->
@@ -247,6 +259,7 @@ class AddTransactionViewModel @Inject constructor(
         try {
             val id = editingId
             val transactionId: String
+            val occurredAt = id?.let { editingOccurredAt } ?: LocalDate.now()
             if (id != null) {
                 transactionRepository.update(
                     id = id,
@@ -254,7 +267,7 @@ class AddTransactionViewModel @Inject constructor(
                     categoryId = categoryId,
                     type = type,
                     amount = amount,
-                    occurredAt = editingOccurredAt,
+                    occurredAt = occurredAt,
                     note = null,
                 )
                 transactionId = id
@@ -264,12 +277,24 @@ class AddTransactionViewModel @Inject constructor(
                     categoryId = categoryId,
                     type = type,
                     amount = amount,
-                    occurredAt = LocalDate.now(),
+                    occurredAt = occurredAt,
                     note = null,
                 )
             }
             if (overageToWithdraw > 0.0) {
                 piggyBankRepository.recordOverspendWithdrawal(userId, overageToWithdraw, transactionId)
+            }
+            // This manual entry IS this month's payment; the AI service's monthly job
+            // only starts auto-creating it from next month on.
+            val recurringState = uiState.value
+            if (id == null && type == CategoryKind.EXPENSE && recurringState.isRecurring && recurringState.recurringName.isNotBlank()) {
+                recurringPaymentRepository.create(
+                    userId = userId,
+                    name = recurringState.recurringName.trim(),
+                    amount = amount,
+                    categoryId = categoryId,
+                    dayOfMonth = occurredAt.dayOfMonth,
+                )
             }
             syncScheduler.requestImmediateSync()
             _events.emit(AddTransactionEvent.Saved)

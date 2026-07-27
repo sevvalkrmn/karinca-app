@@ -24,12 +24,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +62,7 @@ import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.LabeledIconField
 import com.karinca.app.ui.components.MascotWaveVideo
 import com.karinca.app.ui.components.PrimaryButton
 import java.text.NumberFormat
@@ -229,6 +232,33 @@ fun AddTransactionScreen(
                 }
             }
             Spacer(Modifier.height(4.dp))
+
+            // Only a brand-new expense can be marked recurring — editing an existing
+            // one, or an income, never shows this.
+            if (!uiState.isEditMode && uiState.type == CategoryKind.EXPENSE) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().clickable { viewModel.onRecurringToggle(!uiState.isRecurring) },
+                ) {
+                    Checkbox(checked = uiState.isRecurring, onCheckedChange = viewModel::onRecurringToggle)
+                    Text(
+                        "Bu her ay tekrar eden bir ödeme",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (uiState.isRecurring) {
+                    Spacer(Modifier.height(8.dp))
+                    LabeledIconField(
+                        label = "Ödeme Adı",
+                        value = uiState.recurringName,
+                        onValueChange = viewModel::onRecurringNameChange,
+                        leadingIcon = Icons.Filled.Autorenew,
+                        placeholder = "Netflix, kira, vb.",
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+            }
 
             NumericKeypad(onDigit = viewModel::onDigit, onBackspace = viewModel::onBackspace)
             Spacer(Modifier.height(16.dp))

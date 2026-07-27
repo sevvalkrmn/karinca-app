@@ -12,6 +12,7 @@ import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.PiggyBankEntryDao
 import com.karinca.app.data.local.dao.ProfileDao
+import com.karinca.app.data.local.dao.RecurringPaymentDao
 import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
 import com.karinca.app.data.remote.dto.CategoryDto
@@ -19,6 +20,7 @@ import com.karinca.app.data.remote.dto.ConsentDto
 import com.karinca.app.data.remote.dto.GoalDto
 import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
+import com.karinca.app.data.remote.dto.RecurringPaymentDto
 import com.karinca.app.data.remote.dto.TransactionDto
 import com.karinca.app.data.remote.dto.WeeklyReportDto
 import com.karinca.app.data.remote.parseInstant
@@ -48,6 +50,7 @@ class SyncWorker @AssistedInject constructor(
     private val weeklyReportDao: WeeklyReportDao,
     private val goalDao: GoalDao,
     private val piggyBankEntryDao: PiggyBankEntryDao,
+    private val recurringPaymentDao: RecurringPaymentDao,
     private val cursorStore: SyncCursorStore,
 ) : CoroutineWorker(context, params) {
 
@@ -62,6 +65,7 @@ class SyncWorker @AssistedInject constructor(
             pullWeeklyReports()
             pullGoals()
             pullPiggyBankEntries()
+            pullRecurringPayments()
             Log.d(TAG, "Sync succeeded")
             Result.success()
         } catch (e: Exception) {
@@ -101,6 +105,10 @@ class SyncWorker @AssistedInject constructor(
                     SyncTable.PIGGY_BANK_ENTRIES.remoteName -> {
                         val row = piggyBankEntryDao.get(entry.entityId) ?: continue
                         postgrest.from(SyncTable.PIGGY_BANK_ENTRIES.remoteName).upsert(row.toDto())
+                    }
+                    SyncTable.RECURRING_PAYMENTS.remoteName -> {
+                        val row = recurringPaymentDao.get(entry.entityId) ?: continue
+                        postgrest.from(SyncTable.RECURRING_PAYMENTS.remoteName).upsert(row.toDto())
                     }
                 }
                 outboxDao.remove(entry.tableName, entry.entityId)
@@ -233,6 +241,23 @@ class SyncWorker @AssistedInject constructor(
         if (maxSeen > cursor) cursorStore.advance(SyncTable.PIGGY_BANK_ENTRIES, maxSeen)
     }
 
+    private suspend fun pullRecurringPayments() {
+        val cursor = cursorStore.get(SyncTable.RECURRING_PAYMENTS)
+        var maxSeen = cursor
+        val rows = postgrest.from(SyncTable.RECURRING_PAYMENTS.remoteName)
+            .select {
+                filter { gt("server_updated_at", cursor.toString()) }
+                order("server_updated_at", Order.ASCENDING)
+            }
+            .decodeList<RecurringPaymentDto>()
+
+        for (dto in rows) {
+            mergeRecurringPayment(dto)
+            dto.serverUpdatedAt?.let { maxSeen = maxOf(maxSeen, parseInstant(it)) }
+        }
+        if (maxSeen > cursor) cursorStore.advance(SyncTable.RECURRING_PAYMENTS, maxSeen)
+    }
+
     // Pull-side conflict resolution: only overwrite the local row if the incoming
     // updated_at is at least as new as local. If local wins, its outbox entry (if any)
     // stays queued so the newer local edit still gets pushed. If remote wins, drop any
@@ -291,5 +316,14 @@ class SyncWorker @AssistedInject constructor(
     private suspend fun mergePiggyBankEntry(dto: PiggyBankEntryDto) {
         piggyBankEntryDao.upsert(dto.toEntity())
         outboxDao.remove(SyncTable.PIGGY_BANK_ENTRIES.remoteName, dto.id)
+    }
+
+    private suspend fun mergeRecurringPayment(dto: RecurringPaymentDto) {
+        val local = recurringPaymentDao.get(dto.id)
+        val incoming = parseInstant(dto.updatedAt)
+        if (local == null || incoming >= local.updatedAt) {
+            recurringPaymentDao.upsert(dto.toEntity())
+            outboxDao.remove(SyncTable.RECURRING_PAYMENTS.remoteName, dto.id)
+        }
     }
 }

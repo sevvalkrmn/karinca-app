@@ -153,6 +153,49 @@ class SupabaseGateway:
             {"last_auto_income_month": month.isoformat()}
         ).eq("id", user_id).execute()
 
+    # ---------- recurring payments (Aboneliklerim) ----------
+
+    def fetch_active_recurring_payments(self) -> list[dict]:
+        """active = true and not soft-deleted — cancelling from the client sets
+        active = false, which is enough to stop this job from ever seeing it again."""
+        return (
+            self._client.table("recurring_payments")
+            .select("*")
+            .eq("active", True)
+            .is_("deleted_at", "null")
+            .execute()
+            .data
+        )
+
+    def ensure_recurring_payment_transaction(
+        self, transaction_id: str, user_id: str, category_id: str | None, amount: float, occurred_at: date
+    ) -> bool:
+        """Same check-then-insert idempotency as ensure_auto_income_transaction, just
+        for an expense instead of the fixed income category."""
+        existing = self._client.table("transactions").select("id").eq("id", transaction_id).execute().data
+        if existing:
+            return False
+        now = _now_iso()
+        self._client.table("transactions").insert(
+            {
+                "id": transaction_id,
+                "user_id": user_id,
+                "category_id": category_id,
+                "type": "expense",
+                "amount": amount,
+                "occurred_at": occurred_at.isoformat(),
+                "source": "auto_recurring_payment",
+                "created_at": now,
+                "updated_at": now,
+            }
+        ).execute()
+        return True
+
+    def update_recurring_payment_last_processed_month(self, payment_id: str, month: date) -> None:
+        self._client.table("recurring_payments").update(
+            {"last_processed_month": month.isoformat()}
+        ).eq("id", payment_id).execute()
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()

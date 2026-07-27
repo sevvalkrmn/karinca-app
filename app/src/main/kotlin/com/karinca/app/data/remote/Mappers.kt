@@ -9,6 +9,7 @@ import com.karinca.app.data.local.entity.ConsentEntity
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.data.local.entity.PiggyBankEntryEntity
 import com.karinca.app.data.local.entity.ProfileEntity
+import com.karinca.app.data.local.entity.RecurringPaymentEntity
 import com.karinca.app.data.local.entity.TransactionEntity
 import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.data.remote.dto.CategoryDto
@@ -16,6 +17,7 @@ import com.karinca.app.data.remote.dto.ConsentDto
 import com.karinca.app.data.remote.dto.GoalDto
 import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
+import com.karinca.app.data.remote.dto.RecurringPaymentDto
 import com.karinca.app.data.remote.dto.TransactionDto
 import com.karinca.app.data.remote.dto.WeeklyReportDto
 import kotlinx.serialization.json.Json
@@ -185,4 +187,30 @@ fun PiggyBankEntryEntity.toDto() = PiggyBankEntryDto(
     transactionId = transactionId,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
+)
+
+fun RecurringPaymentDto.toEntity() = RecurringPaymentEntity(
+    id = id,
+    userId = userId,
+    name = name,
+    amount = amount,
+    categoryId = categoryId,
+    dayOfMonth = dayOfMonth,
+    active = active,
+    createdAt = parseInstant(createdAt),
+    updatedAt = parseInstant(updatedAt),
+    deletedAt = deletedAt?.let(::parseInstant),
+)
+
+fun RecurringPaymentEntity.toDto() = RecurringPaymentDto(
+    id = id,
+    userId = userId,
+    name = name,
+    amount = amount,
+    categoryId = categoryId,
+    dayOfMonth = dayOfMonth,
+    active = active,
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString(),
+    deletedAt = deletedAt?.toString(),
 )
