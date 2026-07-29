@@ -50,11 +50,17 @@ class AuthRepository @Inject constructor(
     // Stored in Supabase's user_metadata at sign-up time (see signUpWithEmail) as two
     // separate keys, not a single "full_name" — not a separate local column either,
     // since it's account-identity data, not financial-profile data.
+    // Google accounts never get first_name/last_name written (only our own email/password
+    // signUpWithEmail does that) — Google's ID token carries given_name/family_name
+    // instead, which Supabase copies into user_metadata as-is, so those are the fallback.
     fun currentUserFirstNameOrNull(): String? =
-        (auth.currentUserOrNull()?.userMetadata?.get("first_name") as? JsonPrimitive)?.contentOrNull
+        userMetadataString("first_name") ?: userMetadataString("given_name")
 
     fun currentUserLastNameOrNull(): String? =
-        (auth.currentUserOrNull()?.userMetadata?.get("last_name") as? JsonPrimitive)?.contentOrNull
+        userMetadataString("last_name") ?: userMetadataString("family_name")
+
+    private fun userMetadataString(key: String): String? =
+        (auth.currentUserOrNull()?.userMetadata?.get(key) as? JsonPrimitive)?.contentOrNull
 
     // Display-only convenience — joins the two separately-stored fields. Never write
     // this back as a single value; updateName()/signUpWithEmail() always take the two
@@ -75,6 +81,17 @@ class AuthRepository @Inject constructor(
                 put("last_name", lastName)
             }
         }
+    }
+
+    // Google sign-in never writes first_name/last_name itself (see the given_name/
+    // family_name fallback above) — this backfills them once, right after a Google
+    // sign-in, from the name Credential Manager already returned. Only fires while the
+    // fields are still both unset, so it can never clobber a name the user later
+    // corrected by hand via Kişisel Bilgiler.
+    suspend fun fillNameFromGoogleIfMissing(firstName: String?, lastName: String?) {
+        if (currentUserFirstNameOrNull() != null || currentUserLastNameOrNull() != null) return
+        if (firstName.isNullOrBlank() && lastName.isNullOrBlank()) return
+        updateName(firstName.orEmpty(), lastName.orEmpty())
     }
 
     // Blocks until the session has been loaded from storage and sessionStatus has
@@ -126,6 +143,25 @@ class AuthRepository @Inject constructor(
             this.email = email
             this.password = password
         }
+    }
+
+    // Sends a 6-digit recovery code by email — NOT a magic link, so long as the
+    // project's "Reset Password" email template includes {{ .Token }}. Avoids needing
+    // Android deep-link/App Link plumbing entirely; the code is verified the same way
+    // phone sign-up's OTP already is.
+    suspend fun sendPasswordResetOtp(email: String) {
+        auth.resetPasswordForEmail(email)
+    }
+
+    // Verifying the emailed code establishes a real (recovery) session — the user is
+    // authenticated from this point on, which is what lets updatePassword() below work
+    // and the caller then route them straight into the app.
+    suspend fun verifyPasswordResetOtp(email: String, code: String) {
+        auth.verifyEmailOtp(type = OtpType.Email.RECOVERY, email = email, token = code)
+    }
+
+    suspend fun updatePassword(newPassword: String) {
+        auth.updateUser { password = newPassword }
     }
 
     // Local Room is a re-derivable sync cache, never the source of truth — so signing

@@ -53,6 +53,7 @@ fun OtpVerifyScreen(
                 // sealed AuthEvent is shared across screens so every collector must
                 // handle every case.
                 is AuthEvent.EmailConfirmationRequired -> Unit
+                is AuthEvent.PasswordResetCodeSent -> Unit
             }
         }
     }

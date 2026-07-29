@@ -50,7 +50,9 @@ fun WelcomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onGoogleClick = rememberGoogleSignInAction(
-        onResult = { result -> viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce) },
+        onResult = { result ->
+            viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce, result.firstName, result.lastName)
+        },
         onError = viewModel::showError,
     )
 

@@ -69,6 +69,9 @@ sealed interface AuthEvent {
     // Account created, but the Supabase project requires email confirmation before a
     // session exists — the user must click the link emailed to them, then sign in.
     data object EmailConfirmationRequired : AuthEvent
+    // A password-reset code was just (re)sent — ForgotPasswordScreen navigates to
+    // ResetPasswordScreen on this; ResetPasswordScreen's own resend just re-shows a snackbar.
+    data object PasswordResetCodeSent : AuthEvent
 }
 
 @HiltViewModel
@@ -158,8 +161,28 @@ class AuthViewModel @Inject constructor(
         _events.emit(AuthEvent.OtpSent(phone))
     }
 
-    fun signInWithGoogleIdToken(idToken: String, rawNonce: String?) = launchAuthAction {
+    fun signInWithGoogleIdToken(idToken: String, rawNonce: String?, firstName: String?, lastName: String?) = launchAuthAction {
         authRepository.signInWithGoogleIdToken(idToken, rawNonce)
+        authRepository.fillNameFromGoogleIfMissing(firstName, lastName)
+        emitAuthenticated()
+    }
+
+    fun sendPasswordResetCode() = launchAuthAction {
+        authRepository.sendPasswordResetOtp(uiState.value.email)
+        _events.emit(AuthEvent.PasswordResetCodeSent)
+    }
+
+    // Takes email explicitly (not from uiState) for the same reason resendOtp(phone)
+    // does — ResetPasswordScreen gets its own fresh AuthViewModel instance, scoped
+    // separately from ForgotPasswordScreen's.
+    fun resendPasswordResetCode(email: String) = launchAuthAction {
+        authRepository.sendPasswordResetOtp(email)
+        _events.emit(AuthEvent.PasswordResetCodeSent)
+    }
+
+    fun resetPassword(email: String) = launchAuthAction {
+        authRepository.verifyPasswordResetOtp(email, uiState.value.otpCode)
+        authRepository.updatePassword(uiState.value.password)
         emitAuthenticated()
     }
 

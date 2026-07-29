@@ -1,5 +1,6 @@
 package com.karinca.app.ui.auth
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,12 +61,15 @@ fun SignInScreen(
     onAuthenticated: (KarincaRoute) -> Unit,
     onNeedsOtp: (String) -> Unit,
     onNavigateToSignUp: () -> Unit,
+    onForgotPassword: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onGoogleClick = rememberGoogleSignInAction(
-        onResult = { result -> viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce) },
+        onResult = { result ->
+            viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce, result.firstName, result.lastName)
+        },
         onError = viewModel::showError,
     )
 
@@ -75,6 +79,7 @@ fun SignInScreen(
                 is AuthEvent.Authenticated -> onAuthenticated(event.destination)
                 is AuthEvent.OtpSent -> onNeedsOtp(event.phone)
                 is AuthEvent.EmailConfirmationRequired -> Unit // not reachable from sign-in
+                is AuthEvent.PasswordResetCodeSent -> Unit // not reachable from sign-in
             }
         }
     }
@@ -165,6 +170,7 @@ fun SignInScreen(
                             "Şifremi Unuttum",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable(onClick = onForgotPassword),
                         )
                     }
 

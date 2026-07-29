@@ -54,4 +54,10 @@ sealed interface KarincaRoute {
 
     @Serializable
     data object Subscriptions : KarincaRoute
+
+    @Serializable
+    data object ForgotPassword : KarincaRoute
+
+    @Serializable
+    data class ResetPassword(val email: String) : KarincaRoute
 }

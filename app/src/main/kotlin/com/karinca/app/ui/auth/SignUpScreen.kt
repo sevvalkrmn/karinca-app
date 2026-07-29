@@ -17,13 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,6 +51,7 @@ import com.karinca.app.ui.components.GoogleSignInButton
 import com.karinca.app.ui.components.KarincaWordmark
 import com.karinca.app.ui.components.LabeledIconField
 import com.karinca.app.ui.components.MascotWaveVideo
+import com.karinca.app.ui.components.PasswordRequirementsChecklist
 import com.karinca.app.ui.components.PrimaryButton
 import com.karinca.app.ui.navigation.KarincaRoute
 
@@ -68,7 +67,9 @@ fun SignUpScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val onGoogleClick = rememberGoogleSignInAction(
-        onResult = { result -> viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce) },
+        onResult = { result ->
+            viewModel.signInWithGoogleIdToken(result.idToken, result.rawNonce, result.firstName, result.lastName)
+        },
         onError = viewModel::showError,
     )
 
@@ -81,6 +82,10 @@ fun SignUpScreen(
                     snackbarHostState.showSnackbar("E-postana gönderilen bağlantıya tıklayıp hesabını onayla, sonra giriş yap.")
                     onNavigateToSignIn()
                 }
+                // Not reachable from this screen (only ForgotPasswordScreen triggers it),
+                // but the sealed AuthEvent is shared across screens so every collector
+                // must handle every case.
+                is AuthEvent.PasswordResetCodeSent -> Unit
             }
         }
     }
@@ -266,37 +271,5 @@ fun SignUpScreen(
                 Spacer(Modifier.height(24.dp))
             }
         }
-    }
-}
-
-// Live checklist under the password fields — updates on every keystroke instead of
-// making the user submit repeatedly to discover one unmet rule at a time via a snackbar.
-@Composable
-private fun PasswordRequirementsChecklist(uiState: AuthUiState) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        PasswordRequirementRow("En az 8 karakter", uiState.passwordHasMinLength)
-        PasswordRequirementRow("En az 1 büyük harf", uiState.passwordHasUppercase)
-        PasswordRequirementRow("En az 1 rakam", uiState.passwordHasDigit)
-        if (uiState.confirmPassword.isNotEmpty()) {
-            PasswordRequirementRow("Şifreler eşleşiyor", uiState.passwordsMatch)
-        }
-    }
-}
-
-@Composable
-private fun PasswordRequirementRow(label: String, satisfied: Boolean) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            if (satisfied) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
-            contentDescription = null,
-            tint = if (satisfied) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(16.dp),
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(
-            label,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (satisfied) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }

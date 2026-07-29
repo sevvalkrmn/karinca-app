@@ -1,6 +1,7 @@
 package com.karinca.app.ui.auth
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -14,7 +15,12 @@ import kotlinx.coroutines.launch
 import java.security.MessageDigest
 import java.util.UUID
 
-data class GoogleIdTokenResult(val idToken: String, val rawNonce: String)
+data class GoogleIdTokenResult(
+    val idToken: String,
+    val rawNonce: String,
+    val firstName: String?,
+    val lastName: String?,
+)
 
 // Wraps Android's Credential Manager so AuthViewModel (and AuthRepository below it) never
 // needs a Context. webClientId comes from BuildConfig.GOOGLE_WEB_CLIENT_ID — until the
@@ -42,7 +48,12 @@ suspend fun requestGoogleIdToken(context: Context, webClientId: String): GoogleI
         "Beklenmeyen kimlik bilgisi türü"
     }
     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-    return GoogleIdTokenResult(idToken = googleIdTokenCredential.idToken, rawNonce = rawNonce)
+    return GoogleIdTokenResult(
+        idToken = googleIdTokenCredential.idToken,
+        rawNonce = rawNonce,
+        firstName = googleIdTokenCredential.givenName,
+        lastName = googleIdTokenCredential.familyName,
+    )
 }
 
 // Shared by every screen with a Google button (Welcome, Sign In, Sign Up) so the
@@ -60,8 +71,11 @@ fun rememberGoogleSignInAction(
                 .onSuccess(onResult)
                 // Never it.message here — Android's Credential Manager exceptions carry
                 // internal-sounding text ("No credentials available", etc.), not
-                // anything meant for a user to read.
-                .onFailure { onError("Google ile giriş başarısız oldu, tekrar dener misin?") }
+                // anything meant for a user to read. Logged instead, for diagnosis.
+                .onFailure {
+                    Log.e("GoogleSignIn", "Google sign-in failed", it)
+                    onError("Google ile giriş başarısız oldu, tekrar dener misin?")
+                }
         }
     }
 }

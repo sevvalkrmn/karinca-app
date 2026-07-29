@@ -17,7 +17,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.karinca.app.ui.auth.ForgotPasswordScreen
 import com.karinca.app.ui.auth.OtpVerifyScreen
+import com.karinca.app.ui.auth.ResetPasswordScreen
 import com.karinca.app.ui.auth.SignInScreen
 import com.karinca.app.ui.auth.SignUpScreen
 import com.karinca.app.ui.auth.WelcomeScreen
@@ -81,6 +83,21 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onNavigateToSignUp = {
                     navController.navigate(KarincaRoute.SignUp) { popUpTo(KarincaRoute.Welcome) }
                 },
+                onForgotPassword = { navController.navigate(KarincaRoute.ForgotPassword) },
+            )
+        }
+        composable<KarincaRoute.ForgotPassword> {
+            ForgotPasswordScreen(
+                onCodeSent = { resetEmail -> navController.navigate(KarincaRoute.ResetPassword(resetEmail)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
+        composable<KarincaRoute.ResetPassword> { backStackEntry ->
+            val route: KarincaRoute.ResetPassword = backStackEntry.toRoute()
+            ResetPasswordScreen(
+                email = route.email,
+                onAuthenticated = { destination -> navController.navigateToPostAuth(destination) },
+                onBack = { navController.popBackStack() },
             )
         }
         composable<KarincaRoute.SignUp> {
