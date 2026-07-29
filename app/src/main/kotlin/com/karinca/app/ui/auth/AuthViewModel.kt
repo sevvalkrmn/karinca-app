@@ -7,6 +7,7 @@ import com.karinca.app.data.repository.ConsentRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import com.karinca.app.ui.consent.KvkkPolicy
+import com.karinca.app.ui.toUserMessage
 import com.karinca.app.ui.navigation.KarincaRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -194,7 +195,7 @@ class AuthViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.message ?: "Bir şeyler ters gitti, tekrar dener misin?") }
+                _uiState.update { it.copy(errorMessage = e.toUserMessage()) }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }

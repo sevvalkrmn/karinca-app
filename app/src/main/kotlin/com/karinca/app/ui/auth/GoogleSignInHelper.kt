@@ -58,7 +58,10 @@ fun rememberGoogleSignInAction(
         scope.launch {
             runCatching { requestGoogleIdToken(context, BuildConfig.GOOGLE_WEB_CLIENT_ID) }
                 .onSuccess(onResult)
-                .onFailure { onError(it.message ?: "Google ile giriş başarısız oldu.") }
+                // Never it.message here — Android's Credential Manager exceptions carry
+                // internal-sounding text ("No credentials available", etc.), not
+                // anything meant for a user to read.
+                .onFailure { onError("Google ile giriş başarısız oldu, tekrar dener misin?") }
         }
     }
 }

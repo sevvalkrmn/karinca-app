@@ -8,6 +8,7 @@ import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import com.karinca.app.ui.components.filterAmountInput
+import com.karinca.app.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
@@ -117,7 +118,7 @@ class OnboardingViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.message ?: "Kaydedilemedi, tekrar dener misin?") }
+                _uiState.update { it.copy(errorMessage = e.toUserMessage("Kaydedilemedi, tekrar dener misin?")) }
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
             }
