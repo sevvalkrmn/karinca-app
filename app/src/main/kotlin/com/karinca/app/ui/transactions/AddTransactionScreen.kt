@@ -128,6 +128,24 @@ fun AddTransactionScreen(
                 },
             )
         },
+        // Pinned outside the scrollable content so Kaydet/Güncelle is always reachable
+        // without scrolling, no matter how much fits above it (category list, keypad, etc.).
+        bottomBar = {
+            Surface(shadowElevation = 8.dp, color = MaterialTheme.colorScheme.surface) {
+                Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                    Spacer(Modifier.height(12.dp))
+                    PrimaryButton(
+                        text = if (uiState.isEditMode) "Güncelle" else "Kaydet",
+                        onClick = viewModel::save,
+                        enabled = uiState.canSave,
+                        loading = uiState.isSaving,
+                        shape = PillShape,
+                        trailingIcon = Icons.Filled.CheckCircle,
+                    )
+                    Spacer(Modifier.height(24.dp))
+                }
+            }
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -262,16 +280,6 @@ fun AddTransactionScreen(
 
             NumericKeypad(onDigit = viewModel::onDigit, onBackspace = viewModel::onBackspace)
             Spacer(Modifier.height(16.dp))
-
-            PrimaryButton(
-                text = if (uiState.isEditMode) "Güncelle" else "Kaydet",
-                onClick = viewModel::save,
-                enabled = uiState.canSave,
-                loading = uiState.isSaving,
-                shape = PillShape,
-                trailingIcon = Icons.Filled.CheckCircle,
-            )
-            Spacer(Modifier.height(24.dp))
         }
 
         if (showDeleteConfirm) {
