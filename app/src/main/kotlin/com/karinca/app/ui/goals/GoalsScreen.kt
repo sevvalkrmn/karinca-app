@@ -15,16 +15,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
@@ -39,7 +41,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -49,7 +50,6 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -68,7 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.R
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.ui.components.KarincaBottomBar
-import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.components.MascotWaveVideo
 import java.text.NumberFormat
 import java.time.Instant
@@ -116,21 +116,7 @@ fun GoalsScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { KarincaWordmark() },
-                actions = {
-                    IconButton(onClick = onNavigateProfile) {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Profilim",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
-                },
-            )
-        },
+        topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.HEDEFLER,
@@ -385,6 +371,12 @@ private fun GoalForm(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            // Without these, opening the keyboard to type a name/amount shrinks the
+            // sheet's visible area with nothing scrollable to reach whatever falls below
+            // — which was cutting off the confirm button. imePadding keeps the content
+            // clear of the keyboard; verticalScroll is the fallback if it still doesn't fit.
+            .imePadding()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp)
             .padding(bottom = 32.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),

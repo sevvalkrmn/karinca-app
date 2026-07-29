@@ -19,20 +19,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,7 +45,7 @@ import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.components.KarincaBottomBar
-import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.theme.toComposeColor
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
@@ -76,21 +74,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { KarincaWordmark() },
-                actions = {
-                    IconButton(onClick = onOpenProfile) {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Profilim",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
-                },
-            )
-        },
+        topBar = { KarincaTopBar(onProfileClick = onOpenProfile) },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.GUNLUK,
@@ -102,6 +86,16 @@ fun HomeScreen(
             )
         },
     ) { padding ->
+        // uiState.isLoading is only briefly true (the first emission from Room hasn't
+        // landed yet) — without this gate, every number below defaults to 0/null for
+        // that instant, showing a wrong "₺0,00" (and StatusCard's "no profile yet" CTA)
+        // before flipping to the real values.
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),

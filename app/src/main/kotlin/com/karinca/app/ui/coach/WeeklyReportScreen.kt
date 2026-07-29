@@ -14,16 +14,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.R
 import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.ui.components.KarincaBottomBar
-import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.components.MascotWaveVideo
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -56,21 +51,7 @@ fun WeeklyReportScreen(
     val report by viewModel.latestReport.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { KarincaWordmark() },
-                actions = {
-                    IconButton(onClick = onNavigateProfile) {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Profilim",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
-                },
-            )
-        },
+        topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.KOC,

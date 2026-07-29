@@ -21,17 +21,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.components.KarincaBottomBar
-import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.theme.toComposeColor
 import java.text.NumberFormat
 import java.util.Locale
@@ -69,21 +67,7 @@ fun AnalysisScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { KarincaWordmark() },
-                actions = {
-                    IconButton(onClick = onNavigateProfile) {
-                        Icon(
-                            Icons.Filled.AccountCircle,
-                            contentDescription = "Profilim",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp),
-                        )
-                    }
-                },
-            )
-        },
+        topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.RAPORLAR,
@@ -95,6 +79,15 @@ fun AnalysisScreen(
             )
         },
     ) { padding ->
+        // Same reasoning as HomeScreen: without this, TotalSpendCard/PeriodComparisonCard
+        // would briefly show "₺0,00" from AnalysisUiState's defaults before the first real
+        // Room emission lands.
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),

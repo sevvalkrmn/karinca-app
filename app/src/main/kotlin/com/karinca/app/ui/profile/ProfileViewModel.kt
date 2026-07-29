@@ -20,6 +20,7 @@ data class ProfileUiState(
     val fullName: String?,
     val email: String?,
     val piggyBankBalance: Double = 0.0,
+    val isLoading: Boolean = true,
 )
 
 @HiltViewModel
@@ -39,6 +40,7 @@ class ProfileViewModel @Inject constructor(
             fullName = authRepository.currentUserFullNameOrNull(),
             email = authRepository.currentUserEmailOrNull(),
             piggyBankBalance = balance,
+            isLoading = false,
         )
     }
         .stateIn(

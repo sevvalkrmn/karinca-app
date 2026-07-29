@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -68,6 +69,14 @@ fun KumbaramScreen(onBack: () -> Unit, viewModel: KumbaramViewModel = hiltViewMo
             )
         },
     ) { padding ->
+        // Without this, BalanceCard would briefly show "₺0,00" from KumbaramUiState's
+        // default before the first real Room emission lands.
+        if (uiState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

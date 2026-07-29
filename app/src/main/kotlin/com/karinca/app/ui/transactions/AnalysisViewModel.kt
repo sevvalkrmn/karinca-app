@@ -40,6 +40,7 @@ data class AnalysisUiState(
     // Every category with spend in either period, sorted by this period's total —
     // powers the "Bu Hafta vs Geçen Hafta" (or Ay) comparison table.
     val categoryComparisons: List<CategoryComparison> = emptyList(),
+    val isLoading: Boolean = true,
 )
 
 @HiltViewModel
@@ -56,7 +57,7 @@ class AnalysisViewModel @Inject constructor(
         .flatMapLatest { period ->
             val uid = userId
             if (uid == null) {
-                flowOf(AnalysisUiState(period = period))
+                flowOf(AnalysisUiState(period = period, isLoading = false))
             } else {
                 val current = DateRanges.current(period)
                 val previous = DateRanges.previous(period)
@@ -103,6 +104,7 @@ class AnalysisViewModel @Inject constructor(
                         trendPercent = trend,
                         categoryTotals = breakdown,
                         categoryComparisons = comparisons,
+                        isLoading = false,
                     )
                 }
             }

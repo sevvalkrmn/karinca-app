@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Logout
@@ -30,7 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.ui.components.KarincaBottomBar
-import com.karinca.app.ui.components.KarincaWordmark
+import com.karinca.app.ui.components.KarincaTopBar
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -70,19 +68,7 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { KarincaWordmark() },
-                actions = {
-                    Icon(
-                        Icons.Filled.AccountCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(32.dp).padding(end = 4.dp),
-                    )
-                },
-            )
-        },
+        topBar = { KarincaTopBar() },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.NONE,
@@ -146,7 +132,10 @@ fun ProfileScreen(
                 ProfileMenuRow(
                     icon = Icons.Filled.Savings,
                     title = "Kumbaram",
-                    subtitle = "${turkishCurrencyFormat.format(uiState.piggyBankBalance)} biriktin",
+                    // "..." while the real balance is still loading — showing "₺0,00
+                    // biriktin" as a placeholder would misreport an existing balance as
+                    // empty for the instant before the first Room emission lands.
+                    subtitle = if (uiState.isLoading) "..." else "${turkishCurrencyFormat.format(uiState.piggyBankBalance)} biriktin",
                     onClick = onOpenKumbara,
                 )
                 ProfileMenuRow(

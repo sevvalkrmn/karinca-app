@@ -16,6 +16,7 @@ import javax.inject.Inject
 data class KumbaramUiState(
     val balance: Double = 0.0,
     val entries: List<PiggyBankEntryEntity> = emptyList(),
+    val isLoading: Boolean = true,
 )
 
 @HiltViewModel
@@ -28,11 +29,11 @@ class KumbaramViewModel @Inject constructor(
 
     val uiState: StateFlow<KumbaramUiState> =
         if (userId == null) {
-            flowOf(KumbaramUiState())
+            flowOf(KumbaramUiState(isLoading = false))
         } else {
             combine(
                 piggyBankRepository.observeBalance(userId),
                 piggyBankRepository.observeEntries(userId),
-            ) { balance, entries -> KumbaramUiState(balance = balance, entries = entries) }
+            ) { balance, entries -> KumbaramUiState(balance = balance, entries = entries, isLoading = false) }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), KumbaramUiState())
 }
