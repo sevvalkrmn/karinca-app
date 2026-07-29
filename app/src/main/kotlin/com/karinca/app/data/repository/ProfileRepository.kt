@@ -8,7 +8,10 @@ import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.ProfileDao
 import com.karinca.app.data.local.entity.OutboxEntity
 import com.karinca.app.data.local.entity.ProfileEntity
+import com.karinca.app.data.remote.dto.ProfileDto
 import com.karinca.app.data.sync.SyncTable
+import io.github.jan.supabase.postgrest.Postgrest
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.time.LocalDate
@@ -20,10 +23,29 @@ class ProfileRepository @Inject constructor(
     private val db: KarincaDatabase,
     private val profileDao: ProfileDao,
     private val outboxDao: OutboxDao,
+    private val postgrest: Postgrest,
 ) {
     fun observe(userId: String): Flow<ProfileEntity?> = profileDao.observe(userId)
 
     suspend fun get(userId: String): ProfileEntity? = profileDao.get(userId)
+
+    // Used only for the KVKK-consent -> Onboarding vs Home routing decision. Trusting
+    // local Room there could send an already-onboarded account — signed in on a new
+    // device that hasn't synced yet — back through onboarding, risking overwriting
+    // their real profile with fresh answers. A direct server check avoids that; every
+    // other read in this repository stays local-first as normal. Falls back to the
+    // local cache if the server can't be reached, so a legitimate offline cold start
+    // isn't blocked by a network call that isn't essential to it.
+    suspend fun hasProfileSetup(userId: String): Boolean = try {
+        postgrest.from(SyncTable.PROFILES.remoteName)
+            .select { filter { eq("id", userId) } }
+            .decodeList<ProfileDto>()
+            .isNotEmpty()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        get(userId) != null
+    }
 
     // profiles.id == auth user id, so this is always an upsert. referenceSetAt only
     // advances when the goal/limit itself changes, not on every unrelated edit (e.g.

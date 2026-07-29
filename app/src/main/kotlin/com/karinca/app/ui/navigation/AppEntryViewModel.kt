@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ConsentRepository
 import com.karinca.app.data.repository.GoalRepository
+import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import com.karinca.app.ui.consent.KvkkPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,7 @@ class AppEntryViewModel @Inject constructor(
     private val consentRepository: ConsentRepository,
     private val syncScheduler: SyncScheduler,
     private val goalRepository: GoalRepository,
+    private val profileRepository: ProfileRepository,
 ) : ViewModel() {
 
     private val _startDestination = MutableStateFlow<StartDestination>(StartDestination.Loading)
@@ -51,7 +53,15 @@ class AppEntryViewModel @Inject constructor(
                 // never opens Hedeflerim.
                 viewModelScope.launch { goalRepository.evaluateProgress(userId) }
                 val hasConsented = consentRepository.hasConsented(userId, KvkkPolicy.CURRENT_VERSION)
-                if (hasConsented) KarincaRoute.Home else KarincaRoute.KvkkConsent
+                if (!hasConsented) {
+                    KarincaRoute.KvkkConsent
+                } else if (!profileRepository.hasProfileSetup(userId)) {
+                    // Consented but never finished onboarding (quit mid-wizard) — send
+                    // them back to it instead of Home, where it'd only be a skippable nudge.
+                    KarincaRoute.Onboarding
+                } else {
+                    KarincaRoute.Home
+                }
             }
             _startDestination.value = StartDestination.Route(route)
         }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ConsentRepository
+import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import com.karinca.app.ui.consent.KvkkPolicy
 import com.karinca.app.ui.navigation.KarincaRoute
@@ -73,6 +74,7 @@ sealed interface AuthEvent {
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val consentRepository: ConsentRepository,
+    private val profileRepository: ProfileRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
 
@@ -172,10 +174,14 @@ class AuthViewModel @Inject constructor(
         // backstop for it to show up.
         syncScheduler.requestImmediateSync()
         val userId = authRepository.currentUserIdOrNull()
-        val destination = if (userId != null && consentRepository.hasConsented(userId, KvkkPolicy.CURRENT_VERSION)) {
-            KarincaRoute.Home
-        } else {
+        val destination = if (userId == null || !consentRepository.hasConsented(userId, KvkkPolicy.CURRENT_VERSION)) {
             KarincaRoute.KvkkConsent
+        } else if (!profileRepository.hasProfileSetup(userId)) {
+            // Consented before (e.g. quit mid-wizard last time) but never finished
+            // onboarding — send them back to it instead of Home.
+            KarincaRoute.Onboarding
+        } else {
+            KarincaRoute.Home
         }
         _events.emit(AuthEvent.Authenticated(destination))
     }
