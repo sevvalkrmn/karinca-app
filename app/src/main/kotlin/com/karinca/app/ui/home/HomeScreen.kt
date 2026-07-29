@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -224,13 +225,17 @@ private fun BalanceCard(
     }
 }
 
+// Fixed height (not just wrap-content) so a long formatted amount can never grow this
+// card and push everything below it down the screen — it truncates instead.
+private val StatCardHeight = 160.dp
+
 @Composable
 private fun DailySummaryCard(dailyExpense: Double, modifier: Modifier = Modifier) {
     Surface(
         shape = RoundedCornerShape(32.dp),
         color = MaterialTheme.colorScheme.surfaceContainerLowest,
         shadowElevation = 2.dp,
-        modifier = modifier,
+        modifier = modifier.height(StatCardHeight),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Box(
@@ -241,7 +246,12 @@ private fun DailySummaryCard(dailyExpense: Double, modifier: Modifier = Modifier
             }
             Spacer(Modifier.height(12.dp))
             Text("Günlük Harcama", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(turkishCurrencyFormat.format(dailyExpense), style = MaterialTheme.typography.headlineMedium)
+            Text(
+                turkishCurrencyFormat.format(dailyExpense),
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -259,7 +269,7 @@ private fun StatusCard(
         shadowElevation = 2.dp,
         // Only the "complete your profile" CTA state actually has somewhere useful to
         // send you — once a budget percentage is showing, the card is a plain readout.
-        modifier = if (!hasProfile) modifier.clickable(onClick = onClick) else modifier,
+        modifier = (if (!hasProfile) modifier.clickable(onClick = onClick) else modifier).height(StatCardHeight),
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Box(
@@ -276,7 +286,12 @@ private fun StatusCard(
                 }
                 budgetPercent != null -> {
                     Text("Bütçe Durumu", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("%${budgetPercent.roundToInt()}", style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        "%${budgetPercent.roundToInt()}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
                 else -> {
                     Text("Durum", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
