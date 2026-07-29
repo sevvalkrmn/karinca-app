@@ -37,8 +37,10 @@ data class HomeUiState(
     val displayName: String? = null,
     val balance: Double = 0.0,
     // Real balance minus what active goals should have accumulated by today at a steady
-    // daily pace toward their target date — a nudge to spend less, never a real deduction
-    // (no transaction is created for it, and it never touches `balance` itself).
+    // daily pace toward their target date, minus whatever's already sitting in Kumbara —
+    // money already set aside isn't "spendable" even though it's still part of the raw
+    // income/expense balance below. Neither deduction is a real transaction (goal pacing
+    // never touches `balance`; Kumbara already has its own ledger), just a display nudge.
     val spendableBalance: Double = 0.0,
     val balanceTrendPercent: Double? = null,
     val dailyExpense: Double = 0.0,
@@ -112,6 +114,8 @@ class HomeViewModel @Inject constructor(
                 val reservedForGoals = goals.sumOf { it.pacedAmount(today) }
                 HomeUiState(
                     balance = balance.balance,
+                    // Kumbara balance isn't known inside this combine — subtracted in the
+                    // outer combine below, once piggyBankRepository's flow joins in.
                     spendableBalance = balance.balance - reservedForGoals,
                     balanceTrendPercent = trend,
                     dailyExpense = balance.dailyExpense,
@@ -131,6 +135,7 @@ class HomeViewModel @Inject constructor(
             combine(data, piggyBankRepository.observeBalance(uid), authRepository.state) { state, piggyBalance, _ ->
                 state.copy(
                     piggyBankBalance = piggyBalance,
+                    spendableBalance = state.spendableBalance - piggyBalance,
                     displayName = authRepository.currentUserFirstNameOrNull()?.trim()?.takeIf { it.isNotBlank() },
                 )
             }

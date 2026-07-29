@@ -39,6 +39,7 @@ fun ProfileDto.toEntity() = ProfileEntity(
     regularMonthlyIncome = regularMonthlyIncome,
     variableMonthlyIncome = variableMonthlyIncome,
     coachTone = CoachTone.fromValue(coachTone),
+    initialAlreadySpentAmount = initialAlreadySpentAmount,
     createdAt = parseInstant(createdAt),
     updatedAt = parseInstant(updatedAt),
 )
@@ -52,6 +53,7 @@ fun ProfileEntity.toDto() = ProfileDto(
     regularMonthlyIncome = regularMonthlyIncome,
     variableMonthlyIncome = variableMonthlyIncome,
     coachTone = coachTone.value,
+    initialAlreadySpentAmount = initialAlreadySpentAmount,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),
 )

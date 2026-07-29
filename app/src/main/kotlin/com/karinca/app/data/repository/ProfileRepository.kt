@@ -58,6 +58,9 @@ class ProfileRepository @Inject constructor(
         regularMonthlyIncome: Double,
         variableMonthlyIncome: Double?,
         coachTone: CoachTone,
+        // Only meaningful the very first time a profile is ever saved (onboarding) —
+        // ProfileSetupViewModel's later edits never pass this, so it stays null there.
+        initialAlreadySpentAmount: Double? = null,
     ) {
         val now = Instant.now()
         val existing = profileDao.get(userId)
@@ -74,6 +77,7 @@ class ProfileRepository @Inject constructor(
             regularMonthlyIncome = regularMonthlyIncome,
             variableMonthlyIncome = variableMonthlyIncome,
             coachTone = coachTone,
+            initialAlreadySpentAmount = initialAlreadySpentAmount,
             createdAt = existing?.createdAt ?: now,
             updatedAt = now,
         )

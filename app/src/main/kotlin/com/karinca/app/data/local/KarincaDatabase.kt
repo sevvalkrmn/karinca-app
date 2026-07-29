@@ -29,7 +29,7 @@ import com.karinca.app.data.local.entity.WeeklyReportEntity
 // already-synced rows, so those rows are silently skipped on the next pull instead of
 // being re-downloaded from Supabase. (Top-level, not a KarincaDatabase.VERSION companion
 // constant, so it can be used in this same class's @Database annotation below.)
-internal const val KARINCA_DB_VERSION = 8
+internal const val KARINCA_DB_VERSION = 9
 
 @Database(
     entities = [

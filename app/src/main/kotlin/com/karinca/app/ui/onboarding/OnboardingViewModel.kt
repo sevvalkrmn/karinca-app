@@ -22,18 +22,22 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class OnboardingStep { INCOME, LIMIT, COACH_TONE }
+enum class OnboardingStep { INCOME, LIMIT, ALREADY_SPENT, COACH_TONE }
 
 data class OnboardingUiState(
     val step: OnboardingStep = OnboardingStep.INCOME,
     val incomeText: String = "",
     val limitText: String = "",
+    val alreadySpentText: String = "",
     val coachTone: CoachTone = CoachTone.BALANCED,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
 ) {
     val income: Double get() = incomeText.replace(',', '.').toDoubleOrNull() ?: 0.0
     val limit: Double get() = limitText.replace(',', '.').toDoubleOrNull() ?: 0.0
+    // Optional — a blank answer just means "starting fresh", identical to today's
+    // behavior, so this never blocks continuing.
+    val alreadySpent: Double get() = alreadySpentText.replace(',', '.').toDoubleOrNull() ?: 0.0
 
     // Purely derived from what the user typed — nothing pre-fills limitText, so this
     // is 0 until they enter a spending amount.
@@ -51,6 +55,7 @@ data class OnboardingUiState(
         get() = when (step) {
             OnboardingStep.INCOME -> income > 0.0
             OnboardingStep.LIMIT -> limit > 0.0 && !isSpendRatioTooHigh
+            OnboardingStep.ALREADY_SPENT -> true
             OnboardingStep.COACH_TONE -> !isSaving
         }
 }
@@ -80,11 +85,14 @@ class OnboardingViewModel @Inject constructor(
 
     fun onLimitTextChange(text: String) = _uiState.update { it.copy(limitText = filterAmountInput(text)) }
 
+    fun onAlreadySpentTextChange(text: String) = _uiState.update { it.copy(alreadySpentText = filterAmountInput(text)) }
+
     fun onBack() = _uiState.update { state ->
         val previous = when (state.step) {
             OnboardingStep.INCOME -> OnboardingStep.INCOME
             OnboardingStep.LIMIT -> OnboardingStep.INCOME
-            OnboardingStep.COACH_TONE -> OnboardingStep.LIMIT
+            OnboardingStep.ALREADY_SPENT -> OnboardingStep.LIMIT
+            OnboardingStep.COACH_TONE -> OnboardingStep.ALREADY_SPENT
         }
         state.copy(step = previous)
     }
@@ -92,7 +100,8 @@ class OnboardingViewModel @Inject constructor(
     fun onContinue() {
         when (uiState.value.step) {
             OnboardingStep.INCOME -> _uiState.update { it.copy(step = OnboardingStep.LIMIT) }
-            OnboardingStep.LIMIT -> _uiState.update { it.copy(step = OnboardingStep.COACH_TONE) }
+            OnboardingStep.LIMIT -> _uiState.update { it.copy(step = OnboardingStep.ALREADY_SPENT) }
+            OnboardingStep.ALREADY_SPENT -> _uiState.update { it.copy(step = OnboardingStep.COACH_TONE) }
             OnboardingStep.COACH_TONE -> completeOnboarding()
         }
     }
@@ -112,6 +121,7 @@ class OnboardingViewModel @Inject constructor(
                     regularMonthlyIncome = state.income,
                     variableMonthlyIncome = null,
                     coachTone = state.coachTone,
+                    initialAlreadySpentAmount = state.alreadySpent.takeIf { it > 0.0 },
                 )
                 syncScheduler.requestImmediateSync()
                 _events.emit(OnboardingEvent.Completed)

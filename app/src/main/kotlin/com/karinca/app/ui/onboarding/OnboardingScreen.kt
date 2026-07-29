@@ -119,6 +119,11 @@ fun OnboardingScreen(
                     viewModel::onLimitTextChange,
                     viewModel::onContinue,
                 )
+                OnboardingStep.ALREADY_SPENT -> AlreadySpentStep(
+                    uiState,
+                    viewModel::onAlreadySpentTextChange,
+                    viewModel::onContinue,
+                )
                 OnboardingStep.COACH_TONE -> CoachToneStep(uiState, viewModel::onCoachToneChange, viewModel::onContinue)
             }
 
@@ -330,6 +335,59 @@ private fun LimitStep(
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
     )
+}
+
+@Composable
+private fun AlreadySpentStep(
+    uiState: OnboardingUiState,
+    onAlreadySpentTextChange: (String) -> Unit,
+    onContinue: () -> Unit,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            modifier = Modifier.size(160.dp).padding(bottom = 24.dp),
+        ) {
+            MascotWaveVideo(rawResId = R.raw.karinca_talk)
+        }
+        Text(
+            "Bu Ay Ne Kadar Harcadın?",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Maaşını aldığından bu yana, Karınca'yı kullanmadan önce yaklaşık ne kadar harcadın? Bilmiyorsan boş bırakabilirsin.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(24.dp))
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            "YAKLAŞIK HARCAMA",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            value = uiState.alreadySpentText,
+            onValueChange = onAlreadySpentTextChange,
+            leadingIcon = { Text("₺", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary) },
+            textStyle = MaterialTheme.typography.headlineMedium,
+            placeholder = { Text("0") },
+            singleLine = true,
+            visualTransformation = ThousandsSeparatorTransformation,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+
+    Spacer(Modifier.height(32.dp))
+    PrimaryButton(text = "Devam Et", onClick = onContinue, enabled = uiState.canContinue)
 }
 
 private data class CoachToneOption(val tone: CoachTone, val title: String, val description: String, val icon: ImageVector)

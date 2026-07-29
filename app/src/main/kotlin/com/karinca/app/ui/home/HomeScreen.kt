@@ -167,8 +167,9 @@ private fun BalanceCard(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onPrimary,
             )
-            // Only shown once active goals actually reserve something — otherwise it would
-            // just repeat the number above with an extra label.
+            // Only shown once something (an active goal's pace, or Kumbara savings) is
+            // actually reserved out of the raw balance — otherwise it would just repeat
+            // the number above with an extra label.
             if (spendableBalance < balance - 0.01) {
                 Spacer(Modifier.height(4.dp))
                 Text(

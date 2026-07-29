@@ -17,6 +17,9 @@ data class ProfileEntity(
     val regularMonthlyIncome: Double,
     val variableMonthlyIncome: Double?, // optional — irregular/gig income on top of the regular amount
     val coachTone: CoachTone,
+    // Only meaningful at profile creation — read once by the settle_initial_income
+    // Postgres trigger to prorate the very first Kumbara sweep, then never used again.
+    val initialAlreadySpentAmount: Double?,
     val createdAt: Instant,
     val updatedAt: Instant, // client-authoritative last-write-wins field
 )

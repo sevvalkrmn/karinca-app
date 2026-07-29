@@ -13,6 +13,7 @@ data class ProfileDto(
     @SerialName("regular_monthly_income") val regularMonthlyIncome: Double,
     @SerialName("variable_monthly_income") val variableMonthlyIncome: Double? = null,
     @SerialName("coach_tone") val coachTone: String,
+    @SerialName("initial_already_spent_amount") val initialAlreadySpentAmount: Double? = null,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String,
     // Only present on pull responses; omitted on push since the server trigger owns it.
