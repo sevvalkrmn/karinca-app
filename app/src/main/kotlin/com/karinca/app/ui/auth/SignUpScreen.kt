@@ -17,11 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -151,11 +153,21 @@ fun SignUpScreen(
                         Spacer(Modifier.height(24.dp))
 
                         LabeledIconField(
-                            label = "Ad Soyad",
-                            value = uiState.name,
-                            onValueChange = viewModel::onNameChange,
+                            label = "Ad",
+                            value = uiState.firstName,
+                            onValueChange = viewModel::onFirstNameChange,
                             leadingIcon = Icons.Filled.Person,
-                            placeholder = "Adın ve Soyadın",
+                            placeholder = "Adın",
+                            shape = PillShape,
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        LabeledIconField(
+                            label = "Soyad",
+                            value = uiState.lastName,
+                            onValueChange = viewModel::onLastNameChange,
+                            leadingIcon = Icons.Filled.Person,
+                            placeholder = "Soyadın",
                             shape = PillShape,
                             containerColor = MaterialTheme.colorScheme.surfaceBright,
                         )
@@ -208,10 +220,13 @@ fun SignUpScreen(
                                 }
                             },
                         )
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(12.dp))
+                        PasswordRequirementsChecklist(uiState)
+                        Spacer(Modifier.height(12.dp))
                         PrimaryButton(
                             text = "Kayıt Ol",
                             shape = PillShape,
+                            enabled = uiState.isSignUpPasswordValid,
                             loading = uiState.isLoading,
                             onClick = viewModel::signUp,
                         )
@@ -251,5 +266,37 @@ fun SignUpScreen(
                 Spacer(Modifier.height(24.dp))
             }
         }
+    }
+}
+
+// Live checklist under the password fields — updates on every keystroke instead of
+// making the user submit repeatedly to discover one unmet rule at a time via a snackbar.
+@Composable
+private fun PasswordRequirementsChecklist(uiState: AuthUiState) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        PasswordRequirementRow("En az 8 karakter", uiState.passwordHasMinLength)
+        PasswordRequirementRow("En az 1 büyük harf", uiState.passwordHasUppercase)
+        PasswordRequirementRow("En az 1 rakam", uiState.passwordHasDigit)
+        if (uiState.confirmPassword.isNotEmpty()) {
+            PasswordRequirementRow("Şifreler eşleşiyor", uiState.passwordsMatch)
+        }
+    }
+}
+
+@Composable
+private fun PasswordRequirementRow(label: String, satisfied: Boolean) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            if (satisfied) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+            contentDescription = null,
+            tint = if (satisfied) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (satisfied) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

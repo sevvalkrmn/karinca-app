@@ -126,12 +126,12 @@ class HomeViewModel @Inject constructor(
             }
 
             // authRepository.state re-emits whenever the Supabase session changes (e.g.
-            // after AuthRepository.updateFullName()), which is what makes displayName
+            // after AuthRepository.updateName()), which is what makes displayName
             // re-read instead of freezing at whatever it was when this Flow first combined.
             combine(data, piggyBankRepository.observeBalance(uid), authRepository.state) { state, piggyBalance, _ ->
                 state.copy(
                     piggyBankBalance = piggyBalance,
-                    displayName = authRepository.currentUserFullNameOrNull()?.trim()?.substringBefore(" ")?.takeIf { it.isNotBlank() },
+                    displayName = authRepository.currentUserFirstNameOrNull()?.trim()?.takeIf { it.isNotBlank() },
                 )
             }
         }

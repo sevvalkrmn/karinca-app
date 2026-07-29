@@ -29,7 +29,7 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     // authRepository.state re-emits whenever the Supabase session changes — including
-    // after AuthRepository.updateFullName() — so this re-reads the name instead of
+    // after AuthRepository.updateName() — so this re-reads the name instead of
     // freezing it at whatever it was when the ViewModel was first created.
     val uiState: StateFlow<ProfileUiState> = combine(
         authRepository.state,

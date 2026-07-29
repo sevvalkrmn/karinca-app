@@ -47,18 +47,33 @@ class AuthRepository @Inject constructor(
 
     fun currentUserEmailOrNull(): String? = auth.currentUserOrNull()?.email
 
-    // Stored in Supabase's user_metadata at sign-up time (see signUpWithEmail) — not a
-    // separate local column, since it's account-identity data, not financial-profile data.
+    // Stored in Supabase's user_metadata at sign-up time (see signUpWithEmail) as two
+    // separate keys, not a single "full_name" — not a separate local column either,
+    // since it's account-identity data, not financial-profile data.
+    fun currentUserFirstNameOrNull(): String? =
+        (auth.currentUserOrNull()?.userMetadata?.get("first_name") as? JsonPrimitive)?.contentOrNull
+
+    fun currentUserLastNameOrNull(): String? =
+        (auth.currentUserOrNull()?.userMetadata?.get("last_name") as? JsonPrimitive)?.contentOrNull
+
+    // Display-only convenience — joins the two separately-stored fields. Never write
+    // this back as a single value; updateName()/signUpWithEmail() always take the two
+    // parts separately.
     fun currentUserFullNameOrNull(): String? =
-        (auth.currentUserOrNull()?.userMetadata?.get("full_name") as? JsonPrimitive)?.contentOrNull
+        listOfNotNull(currentUserFirstNameOrNull(), currentUserLastNameOrNull())
+            .joinToString(" ")
+            .ifBlank { null }
 
     // Lets accounts that never captured a name (Google/phone sign-in, or accounts created
     // before this field existed) set/correct it later from Kişisel Bilgiler. updateUser
-    // refreshes the SDK's cached current user by default, so currentUserFullNameOrNull()
-    // reflects the change immediately after this returns.
-    suspend fun updateFullName(fullName: String) {
+    // refreshes the SDK's cached current user by default, so currentUserFirstNameOrNull()/
+    // currentUserLastNameOrNull() reflect the change immediately after this returns.
+    suspend fun updateName(firstName: String, lastName: String) {
         auth.updateUser {
-            data = buildJsonObject { put("full_name", fullName) }
+            data = buildJsonObject {
+                put("first_name", firstName)
+                put("last_name", lastName)
+            }
         }
     }
 
@@ -94,11 +109,14 @@ class AuthRepository @Inject constructor(
     // Supabase project has "Confirm email" enabled — in that case the account exists but
     // there is no session until the user clicks the link emailed to them, and the caller
     // must not treat this as a successful login.
-    suspend fun signUpWithEmail(email: String, password: String, fullName: String): Boolean {
+    suspend fun signUpWithEmail(email: String, password: String, firstName: String, lastName: String): Boolean {
         auth.signUpWith(Email) {
             this.email = email
             this.password = password
-            this.data = buildJsonObject { put("full_name", fullName) }
+            this.data = buildJsonObject {
+                put("first_name", firstName)
+                put("last_name", lastName)
+            }
         }
         return currentUserIdOrNull() != null
     }

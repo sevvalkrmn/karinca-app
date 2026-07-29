@@ -23,7 +23,8 @@ enum class AuthMode { EMAIL, PHONE }
 
 data class AuthUiState(
     val mode: AuthMode = AuthMode.EMAIL,
-    val name: String = "", // sign-up only
+    val firstName: String = "", // sign-up only
+    val lastName: String = "", // sign-up only
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "", // sign-up only
@@ -33,23 +34,28 @@ data class AuthUiState(
     val isConfirmPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-)
+) {
+    // Live, per-keystroke checks (sign-up only) — shown as a checklist under the
+    // password fields instead of making the user submit repeatedly to discover each
+    // unmet rule one at a time via an error snackbar.
+    val passwordHasMinLength: Boolean get() = password.length >= 8
+    val passwordHasUppercase: Boolean get() = password.any { it.isUpperCase() }
+    val passwordHasDigit: Boolean get() = password.any { it.isDigit() }
+    // Only counts as unmet once the user has actually started the confirm field —
+    // an empty confirm field shouldn't read as a mismatch before they've typed anything.
+    val passwordsMatch: Boolean get() = confirmPassword.isNotEmpty() && password == confirmPassword
 
-// Sign-up-only rules — sign-in intentionally never re-validates against these, since an
+    val isSignUpPasswordValid: Boolean
+        get() = passwordHasMinLength && passwordHasUppercase && passwordHasDigit && passwordsMatch
+}
+
+// Sign-up-only — sign-in intentionally never re-validates against this, since an
 // existing account's password was already accepted under whatever rules were live when it
 // was created.
 private val signUpEmailRegex = Regex("^[^@\\s]+@[^@\\s]+\\.[A-Za-z]{2,}$")
 
 private fun validateSignUpEmail(email: String): String? =
     if (!signUpEmailRegex.matches(email)) "Geçerli bir e-posta adresi gir (örn. isim@ornek.com)." else null
-
-private fun validateSignUpPassword(password: String, confirmPassword: String): String? = when {
-    password.length < 8 -> "Şifre en az 8 karakter olmalı."
-    password.none { it.isUpperCase() } -> "Şifre en az 1 büyük harf içermeli."
-    password.none { it.isDigit() } -> "Şifre en az 1 rakam içermeli."
-    password != confirmPassword -> "Şifreler eşleşmiyor."
-    else -> null
-}
 
 sealed interface AuthEvent {
     // Carries the resolved post-auth destination (Home or KvkkConsent) — computed here,
@@ -77,7 +83,8 @@ class AuthViewModel @Inject constructor(
     val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
 
     fun onModeChange(mode: AuthMode) = _uiState.update { it.copy(mode = mode, errorMessage = null) }
-    fun onNameChange(value: String) = _uiState.update { it.copy(name = value) }
+    fun onFirstNameChange(value: String) = _uiState.update { it.copy(firstName = value) }
+    fun onLastNameChange(value: String) = _uiState.update { it.copy(lastName = value) }
     fun onEmailChange(value: String) = _uiState.update { it.copy(email = value) }
     fun onPasswordChange(value: String) = _uiState.update { it.copy(password = value) }
     fun onConfirmPasswordChange(value: String) = _uiState.update { it.copy(confirmPassword = value) }
@@ -102,9 +109,11 @@ class AuthViewModel @Inject constructor(
 
     fun signUp() {
         val state = uiState.value
+        // Password requirements are already enforced by disabling the submit button
+        // (see AuthUiState.isSignUpPasswordValid) — only email format still needs a
+        // submit-time check here.
         if (state.mode == AuthMode.EMAIL) {
             val validationError = validateSignUpEmail(state.email)
-                ?: validateSignUpPassword(state.password, state.confirmPassword)
             if (validationError != null) {
                 _uiState.update { it.copy(errorMessage = validationError) }
                 return
@@ -116,7 +125,8 @@ class AuthViewModel @Inject constructor(
                     val sessionEstablished = authRepository.signUpWithEmail(
                         email = uiState.value.email,
                         password = uiState.value.password,
-                        fullName = uiState.value.name,
+                        firstName = uiState.value.firstName,
+                        lastName = uiState.value.lastName,
                     )
                     if (sessionEstablished) {
                         emitAuthenticated()
