@@ -7,6 +7,7 @@ import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
+import com.karinca.app.ui.components.filterAmountInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
@@ -72,11 +73,11 @@ class OnboardingViewModel @Inject constructor(
     private val _events = MutableSharedFlow<OnboardingEvent>()
     val events: SharedFlow<OnboardingEvent> = _events.asSharedFlow()
 
-    fun onIncomeChange(text: String) = _uiState.update { it.copy(incomeText = text) }
+    fun onIncomeChange(text: String) = _uiState.update { it.copy(incomeText = filterAmountInput(text)) }
 
     fun onCoachToneChange(tone: CoachTone) = _uiState.update { it.copy(coachTone = tone) }
 
-    fun onLimitTextChange(text: String) = _uiState.update { it.copy(limitText = text) }
+    fun onLimitTextChange(text: String) = _uiState.update { it.copy(limitText = filterAmountInput(text)) }
 
     fun onBack() = _uiState.update { state ->
         val previous = when (state.step) {

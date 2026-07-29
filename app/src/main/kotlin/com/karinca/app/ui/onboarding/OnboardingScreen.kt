@@ -63,6 +63,7 @@ import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.MascotWaveVideo
 import com.karinca.app.ui.components.PrimaryButton
 import com.karinca.app.ui.components.SpendRatioWarning
+import com.karinca.app.ui.components.ThousandsSeparatorTransformation
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -197,6 +198,8 @@ private fun IncomeStep(uiState: OnboardingUiState, onIncomeChange: (String) -> U
             leadingIcon = { Text("₺", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary) },
             textStyle = MaterialTheme.typography.headlineMedium,
             placeholder = { Text("0") },
+            singleLine = true,
+            visualTransformation = ThousandsSeparatorTransformation,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth(),
         )
@@ -261,6 +264,8 @@ private fun LimitStep(
                 onValueChange = onLimitTextChange,
                 leadingIcon = { Text("₺", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary) },
                 textStyle = MaterialTheme.typography.headlineMedium,
+                singleLine = true,
+                visualTransformation = ThousandsSeparatorTransformation,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth(),
             )

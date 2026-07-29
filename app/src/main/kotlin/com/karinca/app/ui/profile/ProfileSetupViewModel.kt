@@ -7,6 +7,7 @@ import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
+import com.karinca.app.ui.components.filterAmountInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
@@ -98,8 +99,8 @@ class ProfileSetupViewModel @Inject constructor(
 
     fun onFirstNameChange(text: String) = _uiState.update { it.copy(firstNameText = text) }
     fun onLastNameChange(text: String) = _uiState.update { it.copy(lastNameText = text) }
-    fun onBudgetLimitChange(text: String) = _uiState.update { it.copy(budgetLimitText = text) }
-    fun onRegularIncomeChange(text: String) = _uiState.update { it.copy(regularIncomeText = text) }
+    fun onBudgetLimitChange(text: String) = _uiState.update { it.copy(budgetLimitText = filterAmountInput(text)) }
+    fun onRegularIncomeChange(text: String) = _uiState.update { it.copy(regularIncomeText = filterAmountInput(text)) }
     fun onCoachToneChange(tone: CoachTone) = _uiState.update { it.copy(coachTone = tone) }
 
     fun save() {

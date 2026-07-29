@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.PrimaryButton
 import com.karinca.app.ui.components.SpendRatioWarning
+import com.karinca.app.ui.components.ThousandsSeparatorTransformation
 
 private val PillShape = RoundedCornerShape(percent = 50)
 
@@ -111,6 +112,8 @@ fun ProfileSetupScreen(
                 value = uiState.regularIncomeText,
                 onValueChange = viewModel::onRegularIncomeChange,
                 label = { Text("Aylık Gelir (₺)") },
+                singleLine = true,
+                visualTransformation = ThousandsSeparatorTransformation,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 shape = PillShape,
                 modifier = Modifier.fillMaxWidth(),
@@ -120,6 +123,8 @@ fun ProfileSetupScreen(
                 value = uiState.budgetLimitText,
                 onValueChange = viewModel::onBudgetLimitChange,
                 label = { Text("Aylık Bütçe Limiti (₺)") },
+                singleLine = true,
+                visualTransformation = ThousandsSeparatorTransformation,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 shape = PillShape,
                 modifier = Modifier.fillMaxWidth(),
