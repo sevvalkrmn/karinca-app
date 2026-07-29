@@ -38,10 +38,17 @@ data class OnboardingUiState(
     val spendRatioPercent: Int
         get() = if (income > 0.0) (limit / income * 100).roundToInt().coerceIn(0, 100) else 0
 
+    // Required, not just a nudge — "karınca kararınca" is the whole premise of the app,
+    // so a limit that leaves less than 20% for saving blocks continuing until it's fixed.
+    val isSpendRatioTooHigh: Boolean
+        get() = income > 0.0 && limit > 0.0 && spendRatioPercent > 80
+
+    val maxAllowedLimit: Double get() = income * 0.8
+
     val canContinue: Boolean
         get() = when (step) {
             OnboardingStep.INCOME -> income > 0.0
-            OnboardingStep.LIMIT -> limit > 0.0
+            OnboardingStep.LIMIT -> limit > 0.0 && !isSpendRatioTooHigh
             OnboardingStep.COACH_TONE -> !isSaving
         }
 }

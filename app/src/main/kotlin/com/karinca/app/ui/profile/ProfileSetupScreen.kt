@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.PrimaryButton
+import com.karinca.app.ui.components.SpendRatioWarning
 
 private val PillShape = RoundedCornerShape(percent = 50)
 
@@ -82,9 +83,17 @@ fun ProfileSetupScreen(
             Spacer(Modifier.height(4.dp))
 
             OutlinedTextField(
-                value = uiState.fullNameText,
-                onValueChange = viewModel::onFullNameChange,
-                label = { Text("Ad Soyad") },
+                value = uiState.firstNameText,
+                onValueChange = viewModel::onFirstNameChange,
+                label = { Text("Ad") },
+                shape = PillShape,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            OutlinedTextField(
+                value = uiState.lastNameText,
+                onValueChange = viewModel::onLastNameChange,
+                label = { Text("Soyad") },
                 shape = PillShape,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -115,6 +124,10 @@ fun ProfileSetupScreen(
                 shape = PillShape,
                 modifier = Modifier.fillMaxWidth(),
             )
+
+            if (uiState.isSpendRatioTooHigh) {
+                SpendRatioWarning(maxAllowedLimit = uiState.maxAllowedLimit)
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Koç Tonu", style = MaterialTheme.typography.labelLarge)

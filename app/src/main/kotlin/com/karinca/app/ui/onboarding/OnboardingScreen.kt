@@ -48,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -61,6 +62,7 @@ import com.karinca.app.R
 import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.MascotWaveVideo
 import com.karinca.app.ui.components.PrimaryButton
+import com.karinca.app.ui.components.SpendRatioWarning
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -308,6 +310,11 @@ private fun LimitStep(
         }
     }
 
+    if (uiState.isSpendRatioTooHigh) {
+        Spacer(Modifier.height(16.dp))
+        SpendRatioWarning(maxAllowedLimit = uiState.maxAllowedLimit)
+    }
+
     Spacer(Modifier.height(32.dp))
     PrimaryButton(text = "Devam Et", onClick = onContinue, enabled = uiState.canContinue)
     Spacer(Modifier.height(8.dp))
@@ -361,12 +368,19 @@ private fun CoachToneStep(uiState: OnboardingUiState, onToneChange: (CoachTone) 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
         coachToneOptions.forEach { option ->
             val selected = uiState.coachTone == option.tone
+            // Same white card for every state — the alpha-blended tint previously used for
+            // "selected" computed to a color almost indistinguishable from white/the icon
+            // circle's own backdrop, which is exactly the flat, wrong-looking background
+            // being reported. Selection is conveyed by the border + filled radio alone.
             Surface(
                 shape = RoundedCornerShape(16.dp),
-                color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceContainerLowest,
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
                 shadowElevation = 1.dp,
                 modifier = Modifier
                     .fillMaxWidth()
+                    // Clip before border/clickable so the press ripple is cropped to the
+                    // rounded card instead of drawing as a sharp-cornered rectangle over it.
+                    .clip(RoundedCornerShape(16.dp))
                     .border(
                         width = if (selected) 2.dp else 0.dp,
                         color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,

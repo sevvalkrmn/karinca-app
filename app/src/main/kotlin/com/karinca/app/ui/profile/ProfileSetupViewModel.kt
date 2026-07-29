@@ -8,6 +8,7 @@ import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ProfileSetupUiState(
-    val fullNameText: String = "",
+    val firstNameText: String = "",
+    val lastNameText: String = "",
     val email: String = "",
     // Still a plain ReferenceType.LIMIT under the hood (Home's "Bütçe Durumu" card reads
     // profile.referenceAmount regardless of type), but the Limit/Hedef choice and target
@@ -32,11 +34,23 @@ data class ProfileSetupUiState(
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
 ) {
+    private val income: Double get() = regularIncomeText.replace(',', '.').toDoubleOrNull() ?: 0.0
+    private val limit: Double get() = budgetLimitText.replace(',', '.').toDoubleOrNull() ?: 0.0
+
+    // Required, not just a nudge — same 80%-limit rule enforced during onboarding, kept
+    // consistent here since Kişisel Bilgiler can also change income/limit later.
+    val isSpendRatioTooHigh: Boolean
+        get() = income > 0.0 && limit > 0.0 && (limit / income * 100).roundToInt() > 80
+
+    val maxAllowedLimit: Double get() = income * 0.8
+
     val canSave: Boolean
         get() = !isLoading &&
-            fullNameText.isNotBlank() &&
-            (budgetLimitText.replace(',', '.').toDoubleOrNull() ?: 0.0) > 0.0 &&
-            (regularIncomeText.replace(',', '.').toDoubleOrNull() ?: -1.0) >= 0.0
+            firstNameText.isNotBlank() &&
+            lastNameText.isNotBlank() &&
+            limit > 0.0 &&
+            income > 0.0 &&
+            !isSpendRatioTooHigh
 }
 
 sealed interface ProfileSetupEvent {
@@ -61,14 +75,16 @@ class ProfileSetupViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val existing = userId?.let { profileRepository.get(it) }
-            val fullName = authRepository.currentUserFullNameOrNull() ?: ""
+            val firstName = authRepository.currentUserFirstNameOrNull() ?: ""
+            val lastName = authRepository.currentUserLastNameOrNull() ?: ""
             val email = authRepository.currentUserEmailOrNull() ?: ""
             _uiState.update {
                 if (existing == null) {
-                    it.copy(fullNameText = fullName, email = email, isLoading = false)
+                    it.copy(firstNameText = firstName, lastNameText = lastName, email = email, isLoading = false)
                 } else {
                     it.copy(
-                        fullNameText = fullName,
+                        firstNameText = firstName,
+                        lastNameText = lastName,
                         email = email,
                         budgetLimitText = formatAmount(existing.referenceAmount),
                         regularIncomeText = formatAmount(existing.regularMonthlyIncome),
@@ -80,7 +96,8 @@ class ProfileSetupViewModel @Inject constructor(
         }
     }
 
-    fun onFullNameChange(text: String) = _uiState.update { it.copy(fullNameText = text) }
+    fun onFirstNameChange(text: String) = _uiState.update { it.copy(firstNameText = text) }
+    fun onLastNameChange(text: String) = _uiState.update { it.copy(lastNameText = text) }
     fun onBudgetLimitChange(text: String) = _uiState.update { it.copy(budgetLimitText = text) }
     fun onRegularIncomeChange(text: String) = _uiState.update { it.copy(regularIncomeText = text) }
     fun onCoachToneChange(tone: CoachTone) = _uiState.update { it.copy(coachTone = tone) }
@@ -94,7 +111,7 @@ class ProfileSetupViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
-                authRepository.updateFullName(state.fullNameText.trim())
+                authRepository.updateName(state.firstNameText.trim(), state.lastNameText.trim())
                 profileRepository.save(
                     userId = uid,
                     referenceType = ReferenceType.LIMIT,
