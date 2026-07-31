@@ -41,6 +41,10 @@ android {
             "String", "GOOGLE_WEB_CLIENT_ID",
             "\"${localProperties.getProperty("google.webClientId", "")}\""
         )
+        buildConfigField(
+            "String", "AI_SERVICE_URL",
+            "\"${localProperties.getProperty("ai.serviceUrl", "")}\""
+        )
     }
 
     buildFeatures {

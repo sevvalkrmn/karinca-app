@@ -62,3 +62,19 @@ async def revenuecat_webhook(request: Request, authorization: str = Header(defau
     is_pro = fetch_is_pro(app_user_id, settings.revenuecat_entitlement_id, settings.revenuecat_secret_api_key)
     gateway.upsert_entitlement(app_user_id, is_pro, app_user_id)
     return {"user_id": app_user_id, "is_pro": is_pro}
+
+
+@app.post("/account/delete")
+def delete_account(authorization: str = Header(default="")) -> dict:
+    # Unlike every other endpoint above, this one IS client-invoked — authenticated
+    # by the caller's own Supabase access token (verified against Supabase itself),
+    # not a shared secret, since it's the user deleting their own account.
+    token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="missing token")
+    try:
+        user_id = gateway.verify_user_jwt(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="invalid token")
+    gateway.delete_user(user_id)
+    return {"deleted": user_id}

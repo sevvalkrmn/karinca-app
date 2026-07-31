@@ -202,6 +202,20 @@ class SupabaseGateway:
         rows = self._client.table("entitlements").select("user_id").eq("is_pro", True).execute().data
         return {row["user_id"] for row in rows}
 
+    # ---------- account deletion ----------
+
+    def verify_user_jwt(self, access_token: str) -> str:
+        """Returns the user id the token belongs to; raises if invalid/expired —
+        the only thing standing between a client request and a real account
+        deletion, so this must reject anything it isn't sure about."""
+        return self._client.auth.get_user(access_token).user.id
+
+    def delete_user(self, user_id: str) -> None:
+        """Deletes the auth.users row — every other user-owned table (profiles,
+        consents, transactions, goals, piggy_bank_entries, entitlements, ...) is
+        FK'd to it with on delete cascade, so this alone is a full account wipe."""
+        self._client.auth.admin.delete_user(user_id)
+
     def upsert_entitlement(self, user_id: str, is_pro: bool, revenuecat_customer_id: str) -> None:
         self._client.table("entitlements").upsert(
             {

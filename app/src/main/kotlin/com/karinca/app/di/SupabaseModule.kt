@@ -11,6 +11,8 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
 import javax.inject.Singleton
 
 // SUPABASE_URL / SUPABASE_ANON_KEY come from local.properties via BuildConfig (see
@@ -39,4 +41,11 @@ object SupabaseModule {
     @Provides
     @Singleton
     fun provideAuth(client: SupabaseClient): Auth = client.auth
+
+    // Only for calling ai-service's own small REST surface directly (currently just
+    // account deletion) — everything else in the app talks to Supabase via the
+    // supabase-kt client above, never raw HTTP.
+    @Provides
+    @Singleton
+    fun provideHttpClient(): HttpClient = HttpClient(Android)
 }

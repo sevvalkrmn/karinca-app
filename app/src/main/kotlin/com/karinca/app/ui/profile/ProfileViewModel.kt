@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.PiggyBankRepository
+import com.karinca.app.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -55,10 +57,26 @@ class ProfileViewModel @Inject constructor(
     private val _signedOut = MutableSharedFlow<Unit>()
     val signedOut: SharedFlow<Unit> = _signedOut.asSharedFlow()
 
+    private val _errorMessage = MutableSharedFlow<String>()
+    val errorMessage: SharedFlow<String> = _errorMessage.asSharedFlow()
+
     fun signOut() {
         viewModelScope.launch {
             authRepository.signOut()
             _signedOut.emit(Unit)
+        }
+    }
+
+    fun deleteAccount() {
+        viewModelScope.launch {
+            try {
+                authRepository.deleteAccount()
+                _signedOut.emit(Unit)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _errorMessage.emit(e.toUserMessage("Hesap silinemedi, tekrar dener misin?"))
+            }
         }
     }
 }

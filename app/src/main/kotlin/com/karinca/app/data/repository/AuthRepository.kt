@@ -1,5 +1,6 @@
 package com.karinca.app.data.repository
 
+import com.karinca.app.BuildConfig
 import com.karinca.app.data.local.KarincaDatabase
 import com.karinca.app.data.sync.SyncCursorStore
 import io.github.jan.supabase.auth.Auth
@@ -10,6 +11,10 @@ import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.exceptions.RestException
+import io.ktor.client.HttpClient
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +35,7 @@ class AuthRepository @Inject constructor(
     private val auth: Auth,
     private val database: KarincaDatabase,
     private val cursorStore: SyncCursorStore,
+    private val httpClient: HttpClient,
 ) {
     // Cold map over the plugin's StateFlow — a future ViewModel turns this into UI
     // state via stateIn(viewModelScope, ...), same as any other repository Flow here.
@@ -176,6 +182,25 @@ class AuthRepository @Inject constructor(
         auth.signOut()
         withContext(Dispatchers.IO) { database.clearAllTables() }
         cursorStore.resetAll()
+    }
+
+    // Deleting the auth.users row (via ai-service, which alone holds the service-role
+    // key this requires) cascades to every user-owned table in Postgres — full account
+    // wipe server-side. signOut() afterward clears this device the same way it always
+    // does; there's no session left to keep anyway once the account itself is gone.
+    //
+    // No password re-verification — an earlier version required it, but a
+    // Google-only account has no password at all, which would've made this
+    // impossible for exactly the accounts most likely to use it. Being signed in
+    // (an active session) plus an explicit "are you sure?" confirmation in the UI
+    // is the confirmation gate instead.
+    suspend fun deleteAccount() {
+        val token = auth.currentAccessTokenOrNull() ?: error("Oturum bulunamadı")
+        val response = httpClient.post("${BuildConfig.AI_SERVICE_URL}/account/delete") {
+            header("Authorization", "Bearer $token")
+        }
+        if (!response.status.isSuccess()) error("Hesap silinemedi")
+        signOut()
     }
 
     // Cold-start-only check: a cached access token can still look "signed in" for up
