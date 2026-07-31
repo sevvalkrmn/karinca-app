@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.karinca.app.BuildConfig
 import kotlinx.coroutines.launch
@@ -32,14 +32,16 @@ suspend fun requestGoogleIdToken(context: Context, webClientId: String): GoogleI
         .digest(rawNonce.toByteArray())
         .joinToString("") { "%02x".format(it) }
 
-    val googleIdOption = GetGoogleIdOption.Builder()
-        .setFilterByAuthorizedAccounts(false)
-        .setServerClientId(webClientId)
+    // GetSignInWithGoogleOption, not GetGoogleIdOption — the latter is meant for a passive
+    // "One Tap" auto-prompt on app start (and needs setFilterByAuthorizedAccounts to decide
+    // silent vs picker behavior); this is an explicit button tap, which is exactly what
+    // GetSignInWithGoogleOption is for, and it always shows the full account picker.
+    val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(webClientId)
         .setNonce(hashedNonce)
         .build()
 
     val request = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
+        .addCredentialOption(signInWithGoogleOption)
         .build()
 
     val credential = CredentialManager.create(context).getCredential(context, request).credential
