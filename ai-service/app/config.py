@@ -23,8 +23,12 @@ def load_settings() -> Settings:
         llm_provider=os.environ.get("LLM_PROVIDER", "openai"),
         llm_model=os.environ.get("LLM_MODEL", "gpt-4o-mini"),
         report_cron_secret=_require("REPORT_CRON_SECRET"),
-        revenuecat_webhook_secret=_require("REVENUECAT_WEBHOOK_SECRET"),
-        revenuecat_secret_api_key=_require("REVENUECAT_SECRET_API_KEY"),
+        # Optional, not _require()'d — RevenueCat isn't set up yet, and the rest of
+        # this service (account deletion, monthly income, weekly reports) must keep
+        # working regardless. Left blank, the webhook endpoint just never matches a
+        # real "Bearer ..." header, so it stays effectively disabled until set.
+        revenuecat_webhook_secret=os.environ.get("REVENUECAT_WEBHOOK_SECRET", ""),
+        revenuecat_secret_api_key=os.environ.get("REVENUECAT_SECRET_API_KEY", ""),
         revenuecat_entitlement_id=os.environ.get("REVENUECAT_ENTITLEMENT_ID", "pro"),
     )
 
