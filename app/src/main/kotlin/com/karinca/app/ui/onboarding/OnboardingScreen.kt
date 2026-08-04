@@ -322,7 +322,9 @@ private fun LimitStep(
 
     if (uiState.isSpendRatioTooHigh) {
         Spacer(Modifier.height(16.dp))
-        SpendRatioWarning(maxAllowedLimit = uiState.maxAllowedLimit)
+        SpendRatioWarning(
+            "Harcama limitin gelirinin %80'inden (${turkishCurrencyFormat.format(uiState.maxAllowedLimit)}) fazla olamaz.",
+        )
     }
 
     Spacer(Modifier.height(32.dp))
@@ -384,6 +386,14 @@ private fun AlreadySpentStep(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth(),
         )
+    }
+
+    if (uiState.isAlreadySpentTooHigh) {
+        Spacer(Modifier.height(16.dp))
+        SpendRatioWarning("Bu tutar gelirinden fazla olamaz.")
+    } else if (uiState.isAlreadySpentOverLimit) {
+        Spacer(Modifier.height(16.dp))
+        SpendRatioWarning("Bu tutar limitini aştı, bu ay Kumbara'na ekleme yapılmayacak.")
     }
 
     Spacer(Modifier.height(32.dp))

@@ -39,6 +39,17 @@ data class OnboardingUiState(
     // behavior, so this never blocks continuing.
     val alreadySpent: Double get() = alreadySpentText.replace(',', '.').toDoubleOrNull() ?: 0.0
 
+    // Spending more than the whole month's income doesn't make sense within this
+    // model at all — blocks continuing, same rigor as the limit/income ratio check.
+    val isAlreadySpentTooHigh: Boolean
+        get() = income > 0.0 && alreadySpent > income
+
+    // Already over the limit (but still under income) is a real, valid situation —
+    // not blocked — but it means nothing goes to Kumbara this month, worth flagging
+    // rather than silently showing a surprising ₺0 later.
+    val isAlreadySpentOverLimit: Boolean
+        get() = limit > 0.0 && alreadySpent > limit && !isAlreadySpentTooHigh
+
     // Purely derived from what the user typed — nothing pre-fills limitText, so this
     // is 0 until they enter a spending amount.
     val spendRatioPercent: Int
@@ -55,7 +66,7 @@ data class OnboardingUiState(
         get() = when (step) {
             OnboardingStep.INCOME -> income > 0.0
             OnboardingStep.LIMIT -> limit > 0.0 && !isSpendRatioTooHigh
-            OnboardingStep.ALREADY_SPENT -> true
+            OnboardingStep.ALREADY_SPENT -> !isAlreadySpentTooHigh
             OnboardingStep.COACH_TONE -> !isSaving
         }
 }

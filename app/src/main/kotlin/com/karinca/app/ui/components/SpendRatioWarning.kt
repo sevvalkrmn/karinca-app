@@ -16,19 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import java.text.NumberFormat
-import java.util.Locale
 
-private val turkishCurrencyFormat: NumberFormat by lazy {
-    NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
-}
-
-// Shared by the onboarding wizard's Harcama Limiti step and Kişisel Bilgiler — shown
-// whenever the spend/income ratio leaves less than 20% for saving. Both screens also
-// block continuing/saving while this is true (see isSpendRatioTooHigh in each
-// ViewModel) — this explains why the button is disabled, not just a passive nudge.
+// Shared by the onboarding wizard (Harcama Limiti, Bu Ay Ne Kadar Harcadın steps) and
+// Kişisel Bilgiler — a generic amber warning banner, message supplied by the caller.
 @Composable
-fun SpendRatioWarning(maxAllowedLimit: Double, modifier: Modifier = Modifier) {
+fun SpendRatioWarning(message: String, modifier: Modifier = Modifier) {
     Surface(
         shape = RoundedCornerShape(12.dp),
         color = MaterialTheme.colorScheme.tertiaryContainer,
@@ -42,7 +34,7 @@ fun SpendRatioWarning(maxAllowedLimit: Double, modifier: Modifier = Modifier) {
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                "Harcama limitin gelirinin %80'inden (${turkishCurrencyFormat.format(maxAllowedLimit)}) fazla olamaz.",
+                message,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
             )

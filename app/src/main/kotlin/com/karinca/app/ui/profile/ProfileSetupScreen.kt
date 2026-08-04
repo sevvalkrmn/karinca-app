@@ -41,8 +41,14 @@ import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.PrimaryButton
 import com.karinca.app.ui.components.SpendRatioWarning
 import com.karinca.app.ui.components.ThousandsSeparatorTransformation
+import java.text.NumberFormat
+import java.util.Locale
 
 private val PillShape = RoundedCornerShape(percent = 50)
+
+private val turkishCurrencyFormat: NumberFormat by lazy {
+    NumberFormat.getCurrencyInstance(Locale("tr", "TR"))
+}
 
 @Composable
 fun ProfileSetupScreen(
@@ -131,7 +137,9 @@ fun ProfileSetupScreen(
             )
 
             if (uiState.isSpendRatioTooHigh) {
-                SpendRatioWarning(maxAllowedLimit = uiState.maxAllowedLimit)
+                SpendRatioWarning(
+                    "Harcama limitin gelirinin %80'inden (${turkishCurrencyFormat.format(uiState.maxAllowedLimit)}) fazla olamaz.",
+                )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
