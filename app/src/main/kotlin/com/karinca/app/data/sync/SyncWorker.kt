@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import com.karinca.app.data.local.KARINCA_DB_VERSION
 import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
+import com.karinca.app.data.local.dao.EntitlementDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.PiggyBankEntryDao
@@ -17,6 +18,7 @@ import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
 import com.karinca.app.data.remote.dto.CategoryDto
 import com.karinca.app.data.remote.dto.ConsentDto
+import com.karinca.app.data.remote.dto.EntitlementDto
 import com.karinca.app.data.remote.dto.GoalDto
 import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
@@ -51,6 +53,7 @@ class SyncWorker @AssistedInject constructor(
     private val goalDao: GoalDao,
     private val piggyBankEntryDao: PiggyBankEntryDao,
     private val recurringPaymentDao: RecurringPaymentDao,
+    private val entitlementDao: EntitlementDao,
     private val cursorStore: SyncCursorStore,
 ) : CoroutineWorker(context, params) {
 
@@ -66,6 +69,7 @@ class SyncWorker @AssistedInject constructor(
             pullGoals()
             pullPiggyBankEntries()
             pullRecurringPayments()
+            pullEntitlements()
             Log.d(TAG, "Sync succeeded")
             Result.success()
         } catch (e: Exception) {
@@ -205,6 +209,25 @@ class SyncWorker @AssistedInject constructor(
             dto.serverUpdatedAt?.let { maxSeen = maxOf(maxSeen, parseInstant(it)) }
         }
         if (maxSeen > cursor) cursorStore.advance(SyncTable.WEEKLY_REPORTS, maxSeen)
+    }
+
+    private suspend fun pullEntitlements() {
+        val cursor = cursorStore.get(SyncTable.ENTITLEMENTS)
+        var maxSeen = cursor
+        val rows = postgrest.from(SyncTable.ENTITLEMENTS.remoteName)
+            .select {
+                filter { gt("server_updated_at", cursor.toString()) }
+                order("server_updated_at", Order.ASCENDING)
+            }
+            .decodeList<EntitlementDto>()
+
+        Log.d(TAG, "pullEntitlements: cursor=$cursor fetched=${rows.size}")
+        for (dto in rows) {
+            // Read-only mirror: no local-write-wins comparison needed, no outbox entry to clear.
+            entitlementDao.upsertAll(listOf(dto.toEntity()))
+            dto.serverUpdatedAt?.let { maxSeen = maxOf(maxSeen, parseInstant(it)) }
+        }
+        if (maxSeen > cursor) cursorStore.advance(SyncTable.ENTITLEMENTS, maxSeen)
     }
 
     private suspend fun pullGoals() {

@@ -3,6 +3,7 @@
 package com.karinca.app.ui.coach
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +34,8 @@ import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.ui.components.KarincaBottomBar
 import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.components.MascotWaveVideo
+import com.revenuecat.purchases.ui.revenuecatui.Paywall
+import com.revenuecat.purchases.ui.revenuecatui.PaywallOptions
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -49,6 +53,7 @@ fun WeeklyReportScreen(
     viewModel: WeeklyReportViewModel = hiltViewModel(),
 ) {
     val report by viewModel.latestReport.collectAsStateWithLifecycle()
+    val isPro by viewModel.isPro.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
@@ -63,7 +68,32 @@ fun WeeklyReportScreen(
             )
         },
     ) { padding ->
-        if (report == null) {
+        if (isPro == null) {
+            // Pro status not confirmed yet — render nothing decisive rather than
+            // guessing, so neither the report nor the paywall can flash briefly for
+            // the wrong answer before the real, synced value lands (see
+            // WeeklyReportViewModel.isPro).
+            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else if (isPro == false) {
+            // RevenueCat's own Paywall Builder UI (configured in their dashboard) —
+            // fetching offerings, running the purchase, and restore-purchases are all
+            // handled internally, no custom paywall design needed here. This screen has
+            // nothing to show underneath the paywall (the whole screen is Pro-only), so
+            // dismissing it — whether that's a completed purchase or just closing —
+            // leaves via Home rather than revealing empty space; a real purchase means
+            // isPro will already read true by the time they navigate back in here.
+            val paywallOptions = PaywallOptions.Builder(
+                dismissRequest = {
+                    viewModel.onPaywallDismissed()
+                    onNavigateHome()
+                },
+            ).build()
+            Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+                Paywall(options = paywallOptions)
+            }
+        } else if (report == null) {
             EmptyReportState(modifier = Modifier.fillMaxSize().padding(padding))
         } else {
             ReportContent(report = report!!, modifier = Modifier.fillMaxSize().padding(padding))

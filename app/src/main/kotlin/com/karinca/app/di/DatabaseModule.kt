@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.karinca.app.data.local.KarincaDatabase
 import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
+import com.karinca.app.data.local.dao.EntitlementDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.PiggyBankEntryDao
@@ -56,6 +57,9 @@ object DatabaseModule {
 
     @Provides
     fun provideRecurringPaymentDao(db: KarincaDatabase): RecurringPaymentDao = db.recurringPaymentDao()
+
+    @Provides
+    fun provideEntitlementDao(db: KarincaDatabase): EntitlementDao = db.entitlementDao()
 
     @Provides
     fun provideOutboxDao(db: KarincaDatabase): OutboxDao = db.outboxDao()

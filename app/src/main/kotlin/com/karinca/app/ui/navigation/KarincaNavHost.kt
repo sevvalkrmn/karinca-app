@@ -175,7 +175,10 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
             KumbaramScreen(onBack = { navController.popBackStack() })
         }
         composable<KarincaRoute.Subscriptions> {
-            SubscriptionsScreen(onBack = { navController.popBackStack() })
+            SubscriptionsScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
+            )
         }
         composable<KarincaRoute.Goals> {
             GoalsScreen(

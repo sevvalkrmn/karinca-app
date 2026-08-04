@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.karinca.app.data.local.dao.CategoryDao
 import com.karinca.app.data.local.dao.ConsentDao
+import com.karinca.app.data.local.dao.EntitlementDao
 import com.karinca.app.data.local.dao.GoalDao
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.PiggyBankEntryDao
@@ -14,6 +15,7 @@ import com.karinca.app.data.local.dao.TransactionDao
 import com.karinca.app.data.local.dao.WeeklyReportDao
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.local.entity.ConsentEntity
+import com.karinca.app.data.local.entity.EntitlementEntity
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.data.local.entity.OutboxEntity
 import com.karinca.app.data.local.entity.PiggyBankEntryEntity
@@ -29,7 +31,7 @@ import com.karinca.app.data.local.entity.WeeklyReportEntity
 // already-synced rows, so those rows are silently skipped on the next pull instead of
 // being re-downloaded from Supabase. (Top-level, not a KarincaDatabase.VERSION companion
 // constant, so it can be used in this same class's @Database annotation below.)
-internal const val KARINCA_DB_VERSION = 9
+internal const val KARINCA_DB_VERSION = 10
 
 @Database(
     entities = [
@@ -41,6 +43,7 @@ internal const val KARINCA_DB_VERSION = 9
         GoalEntity::class,
         PiggyBankEntryEntity::class,
         RecurringPaymentEntity::class,
+        EntitlementEntity::class,
         OutboxEntity::class,
     ],
     version = KARINCA_DB_VERSION,
@@ -56,5 +59,6 @@ abstract class KarincaDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun piggyBankEntryDao(): PiggyBankEntryDao
     abstract fun recurringPaymentDao(): RecurringPaymentDao
+    abstract fun entitlementDao(): EntitlementDao
     abstract fun outboxDao(): OutboxDao
 }

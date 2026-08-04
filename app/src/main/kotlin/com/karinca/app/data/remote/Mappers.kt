@@ -6,6 +6,7 @@ import com.karinca.app.data.local.PiggyBankEntryReason
 import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.local.entity.ConsentEntity
+import com.karinca.app.data.local.entity.EntitlementEntity
 import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.data.local.entity.PiggyBankEntryEntity
 import com.karinca.app.data.local.entity.ProfileEntity
@@ -14,6 +15,7 @@ import com.karinca.app.data.local.entity.TransactionEntity
 import com.karinca.app.data.local.entity.WeeklyReportEntity
 import com.karinca.app.data.remote.dto.CategoryDto
 import com.karinca.app.data.remote.dto.ConsentDto
+import com.karinca.app.data.remote.dto.EntitlementDto
 import com.karinca.app.data.remote.dto.GoalDto
 import com.karinca.app.data.remote.dto.PiggyBankEntryDto
 import com.karinca.app.data.remote.dto.ProfileDto
@@ -154,6 +156,14 @@ fun GoalEntity.toDto() = GoalDto(
     deletedAt = deletedAt?.toString(),
     completedAt = completedAt?.toString(),
     lastEvaluatedDate = lastEvaluatedDate?.toString(),
+)
+
+// No toDto() for entitlements either — read-only mirror, written exclusively by the
+// RevenueCat webhook (via service-role) server-side, never pushed by the client.
+fun EntitlementDto.toEntity() = EntitlementEntity(
+    userId = userId,
+    isPro = isPro,
+    updatedAt = parseInstant(updatedAt),
 )
 
 // No toDto() for weekly reports — they're a read-only mirror, never pushed.

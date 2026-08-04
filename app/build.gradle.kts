@@ -45,6 +45,10 @@ android {
             "String", "AI_SERVICE_URL",
             "\"${localProperties.getProperty("ai.serviceUrl", "")}\""
         )
+        buildConfigField(
+            "String", "REVENUECAT_API_KEY",
+            "\"${localProperties.getProperty("revenuecat.apiKey", "")}\""
+        )
     }
 
     buildFeatures {
@@ -107,4 +111,7 @@ dependencies {
 
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+
+    implementation(libs.revenuecat.purchases)
+    implementation(libs.revenuecat.purchases.ui)
 }
