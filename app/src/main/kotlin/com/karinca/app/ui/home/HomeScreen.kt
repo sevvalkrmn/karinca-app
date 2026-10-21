@@ -68,6 +68,7 @@ fun HomeScreen(
     onOpenAnalysis: () -> Unit,
     onAddTransaction: () -> Unit,
     onEditTransaction: (String) -> Unit,
+    onOpenAllTransactions: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -134,7 +135,7 @@ fun HomeScreen(
                 }
             }
             item { GoalsSection(uiState.topGoals, onOpenGoals) }
-            item { RecentTransactionsSection(uiState.recentTransactions, onEditTransaction) }
+            item { RecentTransactionsSection(uiState.recentTransactions, onEditTransaction, onOpenAllTransactions) }
             item { Spacer(Modifier.height(4.dp)) }
         }
     }
@@ -378,7 +379,11 @@ private fun GoalsSection(goals: List<GoalEntity>, onOpenGoals: () -> Unit) {
 }
 
 @Composable
-private fun RecentTransactionsSection(transactions: List<TransactionWithCategory>, onEditTransaction: (String) -> Unit) {
+private fun RecentTransactionsSection(
+    transactions: List<TransactionWithCategory>,
+    onEditTransaction: (String) -> Unit,
+    onOpenAllTransactions: () -> Unit,
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -386,9 +391,7 @@ private fun RecentTransactionsSection(transactions: List<TransactionWithCategory
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text("Son Hareketler", style = MaterialTheme.typography.headlineMedium)
-            // "Tümünü Gör" has no destination yet — no chronological all-transactions
-            // screen exists (Günlük tab is still undesigned), so it's inert for now.
-            TextButton(onClick = {}) { Text("Tümünü Gör") }
+            TextButton(onClick = onOpenAllTransactions) { Text("Tümünü Gör") }
         }
         Spacer(Modifier.height(8.dp))
         if (transactions.isEmpty()) {
@@ -407,8 +410,9 @@ private fun RecentTransactionsSection(transactions: List<TransactionWithCategory
     }
 }
 
+// Internal (not private) so AllTransactionsScreen renders the exact same row.
 @Composable
-private fun TransactionRow(entry: TransactionWithCategory, onClick: () -> Unit) {
+internal fun TransactionRow(entry: TransactionWithCategory, onClick: () -> Unit) {
     val category = entry.category
     val tint = category?.color?.toComposeColor() ?: MaterialTheme.colorScheme.primary
     Surface(

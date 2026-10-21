@@ -26,6 +26,7 @@ import com.karinca.app.ui.auth.WelcomeScreen
 import com.karinca.app.ui.categories.CategoriesScreen
 import com.karinca.app.ui.consent.KvkkConsentScreen
 import com.karinca.app.ui.goals.GoalsScreen
+import com.karinca.app.ui.home.AllTransactionsScreen
 import com.karinca.app.ui.home.HomeScreen
 import com.karinca.app.ui.onboarding.OnboardingScreen
 import com.karinca.app.ui.profile.KumbaramScreen
@@ -133,6 +134,15 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onOpenGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onOpenAnalysis = { navController.navigateToTab(KarincaRoute.Analysis) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
+                onEditTransaction = { transactionId ->
+                    navController.navigate(KarincaRoute.AddTransaction(transactionId = transactionId))
+                },
+                onOpenAllTransactions = { navController.navigate(KarincaRoute.AllTransactions) },
+            )
+        }
+        composable<KarincaRoute.AllTransactions> {
+            AllTransactionsScreen(
+                onBack = { navController.popBackStack() },
                 onEditTransaction = { transactionId ->
                     navController.navigate(KarincaRoute.AddTransaction(transactionId = transactionId))
                 },

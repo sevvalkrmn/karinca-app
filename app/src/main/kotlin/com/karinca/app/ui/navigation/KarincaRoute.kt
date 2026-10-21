@@ -47,6 +47,9 @@ sealed interface KarincaRoute {
     data object ProfileSetup : KarincaRoute
 
     @Serializable
+    data object AllTransactions : KarincaRoute
+
+    @Serializable
     data object Kumbaram : KarincaRoute
 
     @Serializable

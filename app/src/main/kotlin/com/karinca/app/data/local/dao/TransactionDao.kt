@@ -80,6 +80,17 @@ interface TransactionDao {
     )
     fun observeRecentAll(userId: String, limit: Int): Flow<List<TransactionEntity>>
 
+    // Every transaction, newest first — the "Tüm İşlemler" screen behind Home's
+    // "Tümünü Gör". Same ordering as observeRecentAll, just without the cap.
+    @Query(
+        """
+        SELECT * FROM transactions
+        WHERE userId = :userId AND deletedAt IS NULL
+        ORDER BY occurredAt DESC, createdAt DESC
+        """
+    )
+    fun observeAll(userId: String): Flow<List<TransactionEntity>>
+
     @Query(
         """
         SELECT * FROM transactions

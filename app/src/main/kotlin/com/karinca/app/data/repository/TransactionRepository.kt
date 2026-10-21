@@ -44,6 +44,8 @@ class TransactionRepository @Inject constructor(
     fun observeRecentAll(userId: String, limit: Int = 5): Flow<List<TransactionEntity>> =
         transactionDao.observeRecentAll(userId, limit)
 
+    fun observeAll(userId: String): Flow<List<TransactionEntity>> = transactionDao.observeAll(userId)
+
     suspend fun get(id: String): TransactionEntity? = transactionDao.get(id)
 
     suspend fun create(
