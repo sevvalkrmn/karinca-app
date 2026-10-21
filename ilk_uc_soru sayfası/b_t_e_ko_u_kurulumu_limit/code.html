@@ -1,0 +1,249 @@
+<!DOCTYPE html><html class="light" lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Karınca - Harcama Limitiniz</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#f7ddd8",
+                    "surface": "#fff8f6",
+                    "surface-container": "#ffe9e5",
+                    "outline": "#8e706b",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-fixed": "#3f0200",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-tertiary-container": "#fffbff",
+                    "inverse-surface": "#3c2d2a",
+                    "primary-fixed-dim": "#ffb4a6",
+                    "tertiary": "#825100",
+                    "surface-variant": "#f7ddd8",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#d0432d",
+                    "on-surface-variant": "#5a413c",
+                    "primary": "#ae2a17",
+                    "on-secondary-container": "#00714d",
+                    "background": "#fff8f6",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-secondary-fixed": "#002113",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#fde2de",
+                    "tertiary-fixed": "#ffddb8",
+                    "error-container": "#ffdad6",
+                    "secondary": "#006c49",
+                    "primary-fixed": "#ffdad4",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#fff0ee",
+                    "surface-dim": "#eed4d0",
+                    "inverse-primary": "#ffb4a6",
+                    "outline-variant": "#e2bfb8",
+                    "on-surface": "#261816",
+                    "tertiary-container": "#a36700",
+                    "secondary-container": "#6cf8bb",
+                    "secondary-fixed-dim": "#4edea3",
+                    "inverse-on-surface": "#ffedea",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#8f1203",
+                    "surface-bright": "#fff8f6",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-primary-container": "#fffbff",
+                    "secondary-fixed": "#6ffbbe",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#b12c19",
+                    "on-background": "#261816"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "32px",
+                    "2xl": "48px",
+                    "md": "16px",
+                    "3xl": "64px",
+                    "gutter": "16px",
+                    "sm": "8px",
+                    "container-margin": "20px",
+                    "lg": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .progress-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #ae2a17;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="w-full top-0 bg-background flex items-center justify-between px-container-margin h-16 z-10">
+<button class="text-primary hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-display-lg text-display-lg text-primary">karınca</span>
+<div class="w-6"></div> <!-- Spacer for balance -->
+</header>
+<main class="flex-1 w-full max-w-[1200px] px-container-margin py-lg flex flex-col">
+<!-- Onboarding Progress -->
+<div class="flex gap-2 mb-xl justify-center">
+<div class="h-1.5 w-12 rounded-full bg-surface-container-highest"></div>
+<div class="h-1.5 w-12 rounded-full bg-primary shadow-sm"></div>
+<div class="h-1.5 w-12 rounded-full bg-surface-container-highest"></div>
+</div>
+<!-- Header Section -->
+<div class="text-center mb-xl">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-sm">Harcama Limitiniz</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[320px] mx-auto">Aylık gelirinin ne kadarını harcamak istiyorsun? Kendine bir limit belirle.</p>
+</div>
+<!-- Central Mascot Context -->
+<div class="relative flex justify-center mb-xl group">
+
+<div class="w-40 h-40 md:w-56 md:h-56 relative bg-surface-container rounded-full flex items-center justify-center overflow-visible">
+<img alt="Karınca Mascot" class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo9XKepXxtE94sZ4XxxC1nzYOtZjcBFhZ38p6aHKyY1om3wP5BzGkZKh3jTbW8f96Cr04YUnkXElO_zq-jI3Lw1kUcz1HChueU1rD2bkprmJRtdGDwqKgncFXGo2KmpIYx1K1SjSQWqL6rEQzWr7knFICVP0X0YNM-kgqjj_ZEnzjYOsELUjm9stwCsV_6d7bNU4rdqCMGlVOEwM9tLzuTerjAvfWKlRIfIgmilP61p4Ok_c0Rkpw19Dqs-fb3Xow85jwpncn-HiB8">
+</div>
+</div>
+<!-- Interactive Spending Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-md border border-surface-container-low max-w-md mx-auto w-full mb-3xl">
+<div class="flex flex-col gap-lg">
+<!-- Input Field -->
+<div class="relative">
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-xs ml-base" for="limit">AYLIK HARCAMA LİMİTİ</label>
+<div class="relative group">
+<span class="absolute left-md top-1/2 -translate-y-1/2 text-primary font-headline-md text-headline-md">₺</span>
+<input class="w-full bg-surface py-4 pl-12 pr-md rounded-lg border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary font-headline-md text-headline-md text-on-surface transition-all" id="limit" placeholder="00.00" type="number" value="3500">
+</div>
+</div>
+<!-- Visual Ratio Container -->
+<div class="space-y-md">
+<div class="flex justify-between font-label-md text-label-md">
+<span class="text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">shopping_basket</span> Harcama
+                        </span>
+<span class="text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">savings</span> Birikim
+                        </span>
+</div>
+<!-- Progress Bar Component -->
+<div class="relative h-6 bg-surface-container-highest rounded-full overflow-hidden flex shadow-inner">
+<div class="h-full bg-primary-container transition-all duration-500 ease-out flex items-center justify-end px-3" id="spending-bar" style="width: 70%;">
+<span class="text-[10px] font-bold text-white">%70</span>
+</div>
+<div class="h-full bg-secondary-container transition-all duration-500 ease-out flex items-center justify-start px-3" id="saving-bar" style="width: 30%;">
+<span class="text-[10px] font-bold text-secondary">%30</span>
+</div>
+</div>
+<!-- Range Slider -->
+<div class="pt-sm px-xs">
+<input class="progress-thumb w-full h-2 bg-surface-container rounded-full appearance-none cursor-pointer" id="ratio-slider" max="100" min="0" type="range" value="70">
+</div>
+<p class="text-center font-label-sm text-label-sm text-on-surface-variant italic">
+                        Tahmini Aylık Gelir: ₺5,000
+                    </p>
+</div>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="mt-auto pb-xl flex flex-col items-center">
+<button class="w-full max-w-sm bg-primary text-on-primary py-4 rounded-full font-headline-md text-headline-md shadow-lg active:scale-95 transition-all duration-200 hover:opacity-90">
+                Devam Et
+            </button>
+<p class="mt-md font-label-sm text-label-sm text-on-surface-variant">
+                Daha sonra ayarlardan değiştirebilirsin.
+            </p>
+</div>
+</main>
+<script>
+        const slider = document.getElementById('ratio-slider');
+        const limitInput = document.getElementById('limit');
+        const spendingBar = document.getElementById('spending-bar');
+        const savingBar = document.getElementById('saving-bar');
+        const income = 5000;
+
+        function updateVisuals(spendingPercent) {
+            const spendingVal = Math.round((income * spendingPercent) / 100);
+            limitInput.value = spendingVal;
+            
+            spendingBar.style.width = spendingPercent + '%';
+            savingBar.style.width = (100 - spendingPercent) + '%';
+            
+            spendingBar.querySelector('span').innerText = `%${spendingPercent}`;
+            savingBar.querySelector('span').innerText = `%${100 - spendingPercent}`;
+
+            // Adjust colors based on health
+            if(spendingPercent > 80) {
+                spendingBar.className = "h-full bg-error transition-all duration-500 ease-out flex items-center justify-end px-3";
+            } else {
+                spendingBar.className = "h-full bg-primary-container transition-all duration-500 ease-out flex items-center justify-end px-3";
+            }
+        }
+
+        slider.addEventListener('input', (e) => {
+            updateVisuals(e.target.value);
+        });
+
+        limitInput.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value) || 0;
+            const percent = Math.min(Math.max(Math.round((val / income) * 100), 0), 100);
+            slider.value = percent;
+            
+            spendingBar.style.width = percent + '%';
+            savingBar.style.width = (100 - percent) + '%';
+            spendingBar.querySelector('span').innerText = `%${percent}`;
+            savingBar.querySelector('span').innerText = `%${100 - percent}`;
+        });
+    </script>
+
+
+</body></html>

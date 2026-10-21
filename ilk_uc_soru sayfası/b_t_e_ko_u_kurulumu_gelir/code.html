@@ -1,0 +1,213 @@
+<!DOCTYPE html><html lang="tr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fff8f6;
+            overflow-x: hidden;
+        }
+        .currency-input-focus:focus-within {
+            border-color: #ae2a17;
+            box-shadow: 0 0 0 4px rgba(174, 42, 23, 0.1);
+        }
+        .bounce-gentle {
+            animation: bounce-gentle 3s ease-in-out infinite;
+        }
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .step-indicator {
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#f7ddd8",
+                        "surface": "#fff8f6",
+                        "surface-container": "#ffe9e5",
+                        "outline": "#8e706b",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary-fixed": "#3f0200",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-container": "#fffbff",
+                        "inverse-surface": "#3c2d2a",
+                        "primary-fixed-dim": "#ffb4a6",
+                        "tertiary": "#825100",
+                        "surface-variant": "#f7ddd8",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#d0432d",
+                        "on-surface-variant": "#5a413c",
+                        "primary": "#ae2a17",
+                        "on-secondary-container": "#00714d",
+                        "background": "#fff8f6",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-fixed": "#002113",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#fde2de",
+                        "tertiary-fixed": "#ffddb8",
+                        "error-container": "#ffdad6",
+                        "secondary": "#006c49",
+                        "primary-fixed": "#ffdad4",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#fff0ee",
+                        "surface-dim": "#eed4d0",
+                        "inverse-primary": "#ffb4a6",
+                        "outline-variant": "#e2bfb8",
+                        "on-surface": "#261816",
+                        "tertiary-container": "#a36700",
+                        "secondary-container": "#6cf8bb",
+                        "secondary-fixed-dim": "#4edea3",
+                        "inverse-on-surface": "#ffedea",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#8f1203",
+                        "surface-bright": "#fff8f6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-primary-container": "#fffbff",
+                        "secondary-fixed": "#6ffbbe",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#b12c19",
+                        "on-background": "#261816"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "xl": "32px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "3xl": "64px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "container-margin": "20px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center">
+<!-- Top AppBar (Simulated Context for Onboarding) -->
+<header class="w-full max-w-md bg-background flex items-center justify-between px-container-margin h-16">
+<button class="text-primary hover:opacity-80 transition-opacity duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-display-lg text-headline-md text-primary font-extrabold tracking-tighter">karınca</span>
+<div class="w-6"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Onboarding Content -->
+<main class="w-full max-w-md flex-1 flex flex-col px-container-margin py-lg">
+<!-- Progress Indicator -->
+<div class="w-full h-2 bg-surface-container rounded-full mb-3xl overflow-hidden">
+<div class="step-indicator h-full bg-primary" style="width: 33.33%;"></div>
+</div>
+<!-- Mascot Section -->
+<div class="flex flex-col items-center mb-xl">
+<div class="w-40 h-40 bounce-gentle relative">
+<img alt="Karınca Maskot" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo9XKepXxtE94sZ4XxxC1nzYOtZjcBFhZ38p6aHKyY1om3wP5BzGkZKh3jTbW8f96Cr04YUnkXElO_zq-jI3Lw1kUcz1HChueU1rD2bkprmJRtdGDwqKgncFXGo2KmpIYx1K1SjSQWqL6rEQzWr7knFICVP0X0YNM-kgqjj_ZEnzjYOsELUjm9stwCsV_6d7bNU4rdqCMGlVOEwM9tLzuTerjAvfWKlRIfIgmilP61p4Ok_c0Rkpw19Dqs-fb3Xow85jwpncn-HiB8">
+</div>
+<div class="mt-md px-lg py-sm bg-surface-container-high rounded-xl relative">
+<div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-surface-container-high rotate-45"></div>
+<p class="font-label-md text-on-surface-variant text-center">Birlikten kuvvet doğar!</p>
+</div>
+</div>
+<!-- Copy Section -->
+<div class="space-y-sm mb-2xl">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Aylık Geliriniz</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Bütçeni planlamaya başlamak için düzenli aylık gelirini girer misin?</p>
+</div>
+<!-- Input Section -->
+<div class="w-full">
+<label class="block font-label-sm text-label-sm text-primary mb-xs ml-base" for="income">TOPLAM GELİR</label>
+<div class="currency-input-focus flex items-center bg-surface-container-lowest border border-outline-variant rounded-xl p-md transition-all duration-300">
+<span class="font-headline-lg text-primary mr-sm">₺</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-display-lg text-headline-lg text-on-surface p-0 placeholder:text-surface-variant" id="income" placeholder="0" type="number">
+</div>
+<p class="mt-sm font-label-sm text-label-sm text-on-surface-variant/60 italic text-center">Maas, yan gelirler ve düzenli tüm kazançlar.</p>
+</div>
+<!-- Action Button (Spacer pushes it to bottom) -->
+<div class="mt-auto pt-2xl">
+<button class="w-full bg-primary text-on-primary font-headline-md text-body-lg py-md rounded-full shadow-md active:scale-95 transition-all duration-200 hover:bg-primary-container">
+                Devam Et
+            </button>
+</div>
+</main>
+<!-- Success Message Micro-interaction -->
+<div class="fixed bottom-24 bg-secondary text-on-secondary px-lg py-sm rounded-full font-label-md shadow-lg transform translate-y-20 opacity-0 transition-all duration-300" id="toast">
+        Gelir kaydedildi!
+    </div>
+<script>
+        // Simple micro-interaction for the input field
+        const incomeInput = document.getElementById('income');
+        const nextBtn = document.querySelector('button.bg-primary');
+        const toast = document.getElementById('toast');
+
+        nextBtn.addEventListener('click', () => {
+            if (incomeInput.value > 0) {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+                
+                // Simulate transition to next step
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                }, 2000);
+            } else {
+                incomeInput.closest('.currency-input-focus').classList.add('border-error');
+                setTimeout(() => {
+                    incomeInput.closest('.currency-input-focus').classList.remove('border-error');
+                }, 500);
+            }
+        });
+
+        // Formating focus state
+        incomeInput.addEventListener('focus', () => {
+            incomeInput.placeholder = "";
+        });
+        incomeInput.addEventListener('blur', () => {
+            if (incomeInput.value === "") incomeInput.placeholder = "0,00";
+        });
+    </script>
+
+
+</body></html>
