@@ -66,7 +66,6 @@ fun HomeScreen(
     onOpenProfileSetup: () -> Unit,
     onOpenGoals: () -> Unit,
     onOpenAnalysis: () -> Unit,
-    onOpenCoach: () -> Unit,
     onAddTransaction: () -> Unit,
     onEditTransaction: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
@@ -81,7 +80,7 @@ fun HomeScreen(
                 onNavigateHome = {},
                 onNavigateGoals = onOpenGoals,
                 onNavigateReports = onOpenAnalysis,
-                onOpenCoach = onOpenCoach,
+                onNavigateProfile = onOpenProfile,
                 onAddTransaction = onAddTransaction,
             )
         },

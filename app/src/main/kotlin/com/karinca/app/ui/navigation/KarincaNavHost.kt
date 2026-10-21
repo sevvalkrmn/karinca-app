@@ -24,7 +24,6 @@ import com.karinca.app.ui.auth.SignInScreen
 import com.karinca.app.ui.auth.SignUpScreen
 import com.karinca.app.ui.auth.WelcomeScreen
 import com.karinca.app.ui.categories.CategoriesScreen
-import com.karinca.app.ui.coach.WeeklyReportScreen
 import com.karinca.app.ui.consent.KvkkConsentScreen
 import com.karinca.app.ui.goals.GoalsScreen
 import com.karinca.app.ui.home.HomeScreen
@@ -133,7 +132,6 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onOpenProfileSetup = { navController.navigate(KarincaRoute.ProfileSetup) },
                 onOpenGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onOpenAnalysis = { navController.navigateToTab(KarincaRoute.Analysis) },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
                 onEditTransaction = { transactionId ->
                     navController.navigate(KarincaRoute.AddTransaction(transactionId = transactionId))
@@ -148,7 +146,6 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onNavigateGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onNavigateReports = { navController.navigateToTab(KarincaRoute.Analysis) },
                 onNavigateProfile = { navController.navigateToTab(KarincaRoute.Profile) },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
             )
         }
@@ -161,7 +158,6 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onNavigateHome = { navController.navigateToTab(KarincaRoute.Home) },
                 onNavigateGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onNavigateReports = { navController.navigateToTab(KarincaRoute.Analysis) },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
             )
         }
@@ -175,17 +171,13 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
             KumbaramScreen(onBack = { navController.popBackStack() })
         }
         composable<KarincaRoute.Subscriptions> {
-            SubscriptionsScreen(
-                onBack = { navController.popBackStack() },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
-            )
+            SubscriptionsScreen(onBack = { navController.popBackStack() })
         }
         composable<KarincaRoute.Goals> {
             GoalsScreen(
                 onNavigateHome = { navController.navigateToTab(KarincaRoute.Home) },
                 onNavigateReports = { navController.navigateToTab(KarincaRoute.Analysis) },
                 onNavigateProfile = { navController.navigateToTab(KarincaRoute.Profile) },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
             )
         }
@@ -204,7 +196,6 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onNavigateHome = { navController.navigateToTab(KarincaRoute.Home) },
                 onNavigateGoals = { navController.navigateToTab(KarincaRoute.Goals) },
                 onNavigateProfile = { navController.navigateToTab(KarincaRoute.Profile) },
-                onOpenCoach = { navController.navigateToTab(KarincaRoute.WeeklyReport) },
                 onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
             )
         }
@@ -219,15 +210,6 @@ private fun KarincaNavGraph(navController: NavHostController, startRoute: Karinc
                 onAddTransaction = { categoryId ->
                     navController.navigate(KarincaRoute.AddTransaction(presetCategoryId = categoryId))
                 },
-            )
-        }
-        composable<KarincaRoute.WeeklyReport> {
-            WeeklyReportScreen(
-                onNavigateHome = { navController.navigateToTab(KarincaRoute.Home) },
-                onNavigateGoals = { navController.navigateToTab(KarincaRoute.Goals) },
-                onNavigateReports = { navController.navigateToTab(KarincaRoute.Analysis) },
-                onNavigateProfile = { navController.navigateToTab(KarincaRoute.Profile) },
-                onAddTransaction = { navController.navigate(KarincaRoute.AddTransaction()) },
             )
         }
     }

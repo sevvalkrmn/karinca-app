@@ -7,9 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
 import com.karinca.app.data.sync.SyncScheduler
-import com.revenuecat.purchases.LogLevel
-import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.PurchasesConfiguration
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -33,12 +30,6 @@ class KarincaApplication : Application(), Configuration.Provider {
     // the Hilt-injected factory).
     override fun onCreate() {
         super.onCreate()
-
-        // Configured with no fixed appUserID here — starts anonymous, then
-        // EntitlementRepository.linkIdentity()/unlinkIdentity() point it at (or away
-        // from) the Supabase user id at every sign-in/sign-out/cold-start-restore.
-        Purchases.logLevel = LogLevel.DEBUG
-        Purchases.configure(PurchasesConfiguration.Builder(this, BuildConfig.REVENUECAT_API_KEY).build())
 
         syncScheduler.schedulePeriodic()
 

@@ -25,8 +25,8 @@ android {
     defaultConfig {
         applicationId = "com.karinca.app"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
+        targetSdk = 35
+        versionCode = 4
         versionName = "0.1.0"
 
         buildConfigField(
@@ -44,10 +44,6 @@ android {
         buildConfigField(
             "String", "AI_SERVICE_URL",
             "\"${localProperties.getProperty("ai.serviceUrl", "")}\""
-        )
-        buildConfigField(
-            "String", "REVENUECAT_API_KEY",
-            "\"${localProperties.getProperty("revenuecat.apiKey", "")}\""
         )
     }
 
@@ -111,7 +107,4 @@ dependencies {
 
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
-
-    implementation(libs.revenuecat.purchases)
-    implementation(libs.revenuecat.purchases.ui)
 }

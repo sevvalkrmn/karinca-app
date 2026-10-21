@@ -93,7 +93,6 @@ fun GoalsScreen(
     onNavigateHome: () -> Unit,
     onNavigateReports: () -> Unit,
     onNavigateProfile: () -> Unit,
-    onOpenCoach: () -> Unit,
     onAddTransaction: () -> Unit,
     viewModel: GoalsViewModel = hiltViewModel(),
 ) {
@@ -123,7 +122,7 @@ fun GoalsScreen(
                 onNavigateHome = onNavigateHome,
                 onNavigateGoals = {},
                 onNavigateReports = onNavigateReports,
-                onOpenCoach = onOpenCoach,
+                onNavigateProfile = onNavigateProfile,
                 onAddTransaction = onAddTransaction,
             )
         },

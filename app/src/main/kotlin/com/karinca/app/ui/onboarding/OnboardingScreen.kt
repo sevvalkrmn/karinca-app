@@ -135,7 +135,7 @@ fun OnboardingScreen(
 @Composable
 private fun StepProgressRow(step: OnboardingStep, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OnboardingStep.entries.forEach { s ->
+        onboardingSteps.forEach { s ->
             val filled = s.ordinal <= step.ordinal
             Box(
                 modifier = Modifier
@@ -397,7 +397,19 @@ private fun AlreadySpentStep(
     }
 
     Spacer(Modifier.height(32.dp))
-    PrimaryButton(text = "Devam Et", onClick = onContinue, enabled = uiState.canContinue)
+    // Final step while the coach-tone step is switched off (see COACH_TONE_ENABLED),
+    // so it takes over CoachToneStep's finishing button.
+    if (uiState.isLastStep) {
+        PrimaryButton(
+            text = "Kurulumu Tamamla",
+            onClick = onContinue,
+            enabled = uiState.canContinue,
+            loading = uiState.isSaving,
+            trailingIcon = Icons.Filled.CheckCircle,
+        )
+    } else {
+        PrimaryButton(text = "Devam Et", onClick = onContinue, enabled = uiState.canContinue)
+    }
 }
 
 private data class CoachToneOption(val tone: CoachTone, val title: String, val description: String, val icon: ImageVector)

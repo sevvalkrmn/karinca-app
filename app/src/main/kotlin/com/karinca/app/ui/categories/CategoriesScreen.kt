@@ -55,7 +55,6 @@ fun CategoriesScreen(
     onNavigateGoals: () -> Unit,
     onNavigateReports: () -> Unit,
     onNavigateProfile: () -> Unit,
-    onOpenCoach: () -> Unit,
     onAddTransaction: () -> Unit,
     viewModel: CategoriesViewModel = hiltViewModel(),
 ) {
@@ -94,7 +93,7 @@ fun CategoriesScreen(
                 onNavigateHome = onNavigateHome,
                 onNavigateGoals = onNavigateGoals,
                 onNavigateReports = onNavigateReports,
-                onOpenCoach = onOpenCoach,
+                onNavigateProfile = onNavigateProfile,
                 onAddTransaction = onAddTransaction,
             )
         },

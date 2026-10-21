@@ -60,7 +60,6 @@ fun AnalysisScreen(
     onNavigateHome: () -> Unit,
     onNavigateGoals: () -> Unit,
     onNavigateProfile: () -> Unit,
-    onOpenCoach: () -> Unit,
     onAddTransaction: () -> Unit,
     viewModel: AnalysisViewModel = hiltViewModel(),
 ) {
@@ -74,7 +73,7 @@ fun AnalysisScreen(
                 onNavigateHome = onNavigateHome,
                 onNavigateGoals = onNavigateGoals,
                 onNavigateReports = {},
-                onOpenCoach = onOpenCoach,
+                onNavigateProfile = onNavigateProfile,
                 onAddTransaction = onAddTransaction,
             )
         },

@@ -36,10 +36,6 @@ class AuthRepository @Inject constructor(
     private val database: KarincaDatabase,
     private val cursorStore: SyncCursorStore,
     private val httpClient: HttpClient,
-    // The one exception to this class being purely the Supabase Auth boundary —
-    // signing out must reset every identity-linked system, RevenueCat included, the
-    // same reasoning already applied to wiping local Room and sync cursors below.
-    private val entitlementRepository: EntitlementRepository,
 ) {
     // Cold map over the plugin's StateFlow — a future ViewModel turns this into UI
     // state via stateIn(viewModelScope, ...), same as any other repository Flow here.
@@ -184,7 +180,6 @@ class AuthRepository @Inject constructor(
     // starts from a full pull straight from Supabase.
     suspend fun signOut() {
         auth.signOut()
-        entitlementRepository.unlinkIdentity()
         withContext(Dispatchers.IO) { database.clearAllTables() }
         cursorStore.resetAll()
     }

@@ -41,6 +41,7 @@ import com.karinca.app.data.local.CoachTone
 import com.karinca.app.ui.components.PrimaryButton
 import com.karinca.app.ui.components.SpendRatioWarning
 import com.karinca.app.ui.components.ThousandsSeparatorTransformation
+import com.karinca.app.ui.onboarding.COACH_TONE_ENABLED
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -142,17 +143,19 @@ fun ProfileSetupScreen(
                 )
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Koç Tonu", style = MaterialTheme.typography.labelLarge)
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    val tones = listOf(CoachTone.GENTLE to "Nazik", CoachTone.BALANCED to "Dengeli", CoachTone.BRUTAL to "Sert")
-                    tones.forEachIndexed { index, (tone, label) ->
-                        SegmentedButton(
-                            selected = uiState.coachTone == tone,
-                            onClick = { viewModel.onCoachToneChange(tone) },
-                            shape = SegmentedButtonDefaults.itemShape(index, tones.size),
-                            label = { Text(label) },
-                        )
+            if (COACH_TONE_ENABLED) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Koç Tonu", style = MaterialTheme.typography.labelLarge)
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        val tones = listOf(CoachTone.GENTLE to "Nazik", CoachTone.BALANCED to "Dengeli", CoachTone.BRUTAL to "Sert")
+                        tones.forEachIndexed { index, (tone, label) ->
+                            SegmentedButton(
+                                selected = uiState.coachTone == tone,
+                                onClick = { viewModel.onCoachToneChange(tone) },
+                                shape = SegmentedButtonDefaults.itemShape(index, tones.size),
+                                label = { Text(label) },
+                            )
+                        }
                     }
                 }
             }

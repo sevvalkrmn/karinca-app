@@ -24,6 +24,15 @@ import javax.inject.Inject
 
 enum class OnboardingStep { INCOME, LIMIT, ALREADY_SPENT, COACH_TONE }
 
+// The coach tone only feeds the AI weekly report, which is switched off for now, so
+// both its pickers are hidden (the wizard's COACH_TONE step and ProfileSetupScreen's
+// "Koç Tonu" row) and profiles keep the default BALANCED tone. Their UI and state are
+// left intact — flip this back to true when the report returns.
+const val COACH_TONE_ENABLED = false
+
+val onboardingSteps: List<OnboardingStep> =
+    OnboardingStep.entries.filter { COACH_TONE_ENABLED || it != OnboardingStep.COACH_TONE }
+
 data class OnboardingUiState(
     val step: OnboardingStep = OnboardingStep.INCOME,
     val incomeText: String = "",
@@ -62,11 +71,13 @@ data class OnboardingUiState(
 
     val maxAllowedLimit: Double get() = income * 0.8
 
+    val isLastStep: Boolean get() = step == onboardingSteps.last()
+
     val canContinue: Boolean
         get() = when (step) {
             OnboardingStep.INCOME -> income > 0.0
             OnboardingStep.LIMIT -> limit > 0.0 && !isSpendRatioTooHigh
-            OnboardingStep.ALREADY_SPENT -> !isAlreadySpentTooHigh
+            OnboardingStep.ALREADY_SPENT -> !isAlreadySpentTooHigh && !isSaving
             OnboardingStep.COACH_TONE -> !isSaving
         }
 }
@@ -112,7 +123,9 @@ class OnboardingViewModel @Inject constructor(
         when (uiState.value.step) {
             OnboardingStep.INCOME -> _uiState.update { it.copy(step = OnboardingStep.LIMIT) }
             OnboardingStep.LIMIT -> _uiState.update { it.copy(step = OnboardingStep.ALREADY_SPENT) }
-            OnboardingStep.ALREADY_SPENT -> _uiState.update { it.copy(step = OnboardingStep.COACH_TONE) }
+            OnboardingStep.ALREADY_SPENT ->
+                if (COACH_TONE_ENABLED) _uiState.update { it.copy(step = OnboardingStep.COACH_TONE) }
+                else completeOnboarding()
             OnboardingStep.COACH_TONE -> completeOnboarding()
         }
     }

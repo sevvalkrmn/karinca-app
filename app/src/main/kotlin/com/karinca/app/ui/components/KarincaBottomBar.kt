@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Flag
@@ -23,22 +23,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.karinca.app.R
 
 /**
  * Shared bottom navigation. Four real tabs (Günlük -> Home, Hedefler -> Goals,
- * Raporlar -> Analysis, Analiz -> Karınca Koçu weekly report) plus a center FAB for adding
- * a transaction. Profile is no longer a bottom-bar tab — it's reached only through the
- * profile icon in each screen's own top bar. There is no "Genel Bakış" tab either —
+ * Raporlar -> Analysis, Profil -> Profile) plus a center FAB for adding a transaction.
+ * Profil took the slot of the old "Analiz" tab (Karınca Koçu weekly report), which is
+ * switched off until the AI report returns. There is no "Genel Bakış" tab —
  * Categories is reached via the "Hepsini Gör" link on the add-transaction category grid
  * instead, so [Tab] has no case for it.
  */
 object KarincaBottomBar {
-    // NONE is for screens reached outside the four primary tabs (e.g. Categories, Profile)
+    // NONE is for screens reached outside the four primary tabs (e.g. Categories)
     // — no item highlights in that case.
-    enum class Tab { GUNLUK, HEDEFLER, RAPORLAR, KOC, NONE }
+    enum class Tab { GUNLUK, HEDEFLER, RAPORLAR, PROFIL, NONE }
 }
 
 @Composable
@@ -47,7 +45,7 @@ fun KarincaBottomBar(
     onNavigateHome: () -> Unit,
     onNavigateGoals: () -> Unit,
     onNavigateReports: () -> Unit,
-    onOpenCoach: () -> Unit,
+    onNavigateProfile: () -> Unit,
     onAddTransaction: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -77,17 +75,10 @@ fun KarincaBottomBar(
                     icon = { tint -> Icon(Icons.Filled.BarChart, contentDescription = null, tint = tint) },
                 )
                 BottomNavItem(
-                    label = "Analiz",
-                    active = activeTab == KarincaBottomBar.Tab.KOC,
-                    onClick = onOpenCoach,
-                    icon = { tint ->
-                        Icon(
-                            painterResource(R.drawable.karinca_maskot),
-                            contentDescription = null,
-                            tint = tint,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    },
+                    label = "Profil",
+                    active = activeTab == KarincaBottomBar.Tab.PROFIL,
+                    onClick = onNavigateProfile,
+                    icon = { tint -> Icon(Icons.Filled.AccountCircle, contentDescription = null, tint = tint) },
                 )
             }
         }

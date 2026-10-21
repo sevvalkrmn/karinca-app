@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ConsentRepository
-import com.karinca.app.data.repository.EntitlementRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
 import com.karinca.app.ui.consent.KvkkPolicy
@@ -80,7 +79,6 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val consentRepository: ConsentRepository,
     private val profileRepository: ProfileRepository,
-    private val entitlementRepository: EntitlementRepository,
     private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
 
@@ -200,7 +198,6 @@ class AuthViewModel @Inject constructor(
         // backstop for it to show up.
         syncScheduler.requestImmediateSync()
         val userId = authRepository.currentUserIdOrNull()
-        userId?.let(entitlementRepository::linkIdentity)
         val destination = if (userId == null || !consentRepository.hasConsented(userId, KvkkPolicy.CURRENT_VERSION)) {
             KarincaRoute.KvkkConsent
         } else if (!profileRepository.hasProfileSetup(userId)) {

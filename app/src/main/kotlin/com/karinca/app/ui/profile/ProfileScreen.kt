@@ -65,7 +65,6 @@ fun ProfileScreen(
     onNavigateHome: () -> Unit,
     onNavigateGoals: () -> Unit,
     onNavigateReports: () -> Unit,
-    onOpenCoach: () -> Unit,
     onAddTransaction: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -85,11 +84,11 @@ fun ProfileScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             KarincaBottomBar(
-                activeTab = KarincaBottomBar.Tab.NONE,
+                activeTab = KarincaBottomBar.Tab.PROFIL,
                 onNavigateHome = onNavigateHome,
                 onNavigateGoals = onNavigateGoals,
                 onNavigateReports = onNavigateReports,
-                onOpenCoach = onOpenCoach,
+                onNavigateProfile = {},
                 onAddTransaction = onAddTransaction,
             )
         },
@@ -140,7 +139,7 @@ fun ProfileScreen(
                 ProfileMenuRow(
                     icon = Icons.Filled.Person,
                     title = "Kişisel Bilgiler",
-                    subtitle = "Gelir, bütçe hedefi ve koç tonunu ayarla",
+                    subtitle = "Gelir ve bütçe hedefini ayarla",
                     onClick = onOpenProfileSetup,
                 )
                 ProfileMenuRow(

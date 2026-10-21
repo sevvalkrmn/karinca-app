@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.ConsentRepository
-import com.karinca.app.data.repository.EntitlementRepository
 import com.karinca.app.data.repository.GoalRepository
 import com.karinca.app.data.repository.ProfileRepository
 import com.karinca.app.data.sync.SyncScheduler
@@ -30,7 +29,6 @@ class AppEntryViewModel @Inject constructor(
     private val syncScheduler: SyncScheduler,
     private val goalRepository: GoalRepository,
     private val profileRepository: ProfileRepository,
-    private val entitlementRepository: EntitlementRepository,
 ) : ViewModel() {
 
     private val _startDestination = MutableStateFlow<StartDestination>(StartDestination.Loading)
@@ -48,7 +46,6 @@ class AppEntryViewModel @Inject constructor(
                 // already wiped local data, so this is a real, fresh sign-out.
                 KarincaRoute.Welcome
             } else {
-                entitlementRepository.linkIdentity(userId)
                 syncScheduler.requestImmediateSync()
                 // Silent here — GoalsViewModel runs the same check again (a no-op if
                 // nothing's changed) and is the one that actually shows a failure dialog.
