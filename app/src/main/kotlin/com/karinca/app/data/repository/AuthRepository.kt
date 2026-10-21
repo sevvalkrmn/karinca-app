@@ -12,9 +12,12 @@ import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.http.isSuccess
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -24,8 +27,6 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.put
-import javax.inject.Inject
-import javax.inject.Singleton
 
 // Wraps the Auth plugin's Supabase-shaped session state; owns no UI, no platform
 // sign-in SDK calls (Google Credential Manager, SMS retrieval, etc. belong to the
@@ -194,13 +195,40 @@ class AuthRepository @Inject constructor(
     // impossible for exactly the accounts most likely to use it. Being signed in
     // (an active session) plus an explicit "are you sure?" confirmation in the UI
     // is the confirmation gate instead.
+    //
+    // ai-service sleeps on Render's free tier and can take ~50s to wake, so the response
+    // may never make it back even though the account really was deleted (seen in the
+    // auth logs: user_deleted, then no logout until the next cold start). Any failure is
+    // therefore double-checked against Supabase itself before being reported — if the
+    // user is gone, the deletion worked and this finishes the local sign-out.
     suspend fun deleteAccount() {
         val token = auth.currentAccessTokenOrNull() ?: error("Oturum bulunamadı")
-        val response = httpClient.post("${BuildConfig.AI_SERVICE_URL}/account/delete") {
-            header("Authorization", "Bearer $token")
+        val failure = try {
+            val response = httpClient.post("${BuildConfig.AI_SERVICE_URL}/account/delete") {
+                header("Authorization", "Bearer $token")
+                timeout { requestTimeoutMillis = 120_000 }
+            }
+            if (response.status.isSuccess()) null else IllegalStateException("Hesap silinemedi: HTTP ${response.status.value}")
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            e
         }
-        if (!response.status.isSuccess()) error("Hesap silinemedi")
+        if (failure != null && !isCurrentUserGone()) throw failure
         signOut()
+    }
+
+    // True only when Supabase positively says the session's user no longer exists —
+    // a network error here proves nothing, so it counts as "still there".
+    private suspend fun isCurrentUserGone(): Boolean = try {
+        auth.retrieveUserForCurrentSession()
+        false
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: RestException) {
+        e.statusCode == 401 || e.statusCode == 403 || e.statusCode == 404
+    } catch (e: Exception) {
+        false
     }
 
     // Cold-start-only check: a cached access token can still look "signed in" for up

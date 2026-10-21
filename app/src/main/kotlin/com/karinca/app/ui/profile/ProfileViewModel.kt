@@ -6,17 +6,19 @@ import com.karinca.app.data.repository.AuthRepository
 import com.karinca.app.data.repository.PiggyBankRepository
 import com.karinca.app.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class ProfileUiState(
     val fullName: String?,
@@ -54,6 +56,11 @@ class ProfileViewModel @Inject constructor(
             ),
         )
 
+    // Deleting can take up to a minute while ai-service wakes up — the screen shows a
+    // blocking progress dialog for as long as this is true.
+    private val _isDeleting = MutableStateFlow(false)
+    val isDeleting: StateFlow<Boolean> = _isDeleting.asStateFlow()
+
     private val _signedOut = MutableSharedFlow<Unit>()
     val signedOut: SharedFlow<Unit> = _signedOut.asSharedFlow()
 
@@ -68,7 +75,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun deleteAccount() {
+        if (_isDeleting.value) return
         viewModelScope.launch {
+            _isDeleting.value = true
             try {
                 authRepository.deleteAccount()
                 _signedOut.emit(Unit)
@@ -76,6 +85,8 @@ class ProfileViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 _errorMessage.emit(e.toUserMessage("Hesap silinemedi, tekrar dener misin?"))
+            } finally {
+                _isDeleting.value = false
             }
         }
     }

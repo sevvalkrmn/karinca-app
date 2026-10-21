@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karinca.app.ui.components.KarincaBottomBar
@@ -71,6 +73,7 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    val isDeleting by viewModel.isDeleting.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.signedOut.collect { onSignedOut() }
@@ -190,6 +193,23 @@ fun ProfileScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { showDeleteConfirm = false }) { Text("Vazgeç") }
+                },
+            )
+        }
+
+        // Blocking on purpose: the request can take up to a minute while the server
+        // wakes up, and leaving or retrying mid-way would only confuse things.
+        if (isDeleting) {
+            AlertDialog(
+                onDismissRequest = {},
+                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+                confirmButton = {},
+                text = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+                        Spacer(Modifier.width(16.dp))
+                        Text("Hesabın siliniyor, bu bir dakika kadar sürebilir…")
+                    }
                 },
             )
         }
