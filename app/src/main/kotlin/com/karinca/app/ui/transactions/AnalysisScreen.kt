@@ -66,7 +66,7 @@ fun AnalysisScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
-        topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
+        topBar = { KarincaTopBar() },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.RAPORLAR,

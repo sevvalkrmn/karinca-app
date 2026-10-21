@@ -115,7 +115,7 @@ fun GoalsScreen(
     }
 
     Scaffold(
-        topBar = { KarincaTopBar(onProfileClick = onNavigateProfile) },
+        topBar = { KarincaTopBar() },
         bottomBar = {
             KarincaBottomBar(
                 activeTab = KarincaBottomBar.Tab.HEDEFLER,
