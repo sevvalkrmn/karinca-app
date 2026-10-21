@@ -38,7 +38,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -70,6 +69,7 @@ import com.karinca.app.data.local.entity.GoalEntity
 import com.karinca.app.ui.components.KarincaBottomBar
 import com.karinca.app.ui.components.KarincaTopBar
 import com.karinca.app.ui.components.MascotWaveVideo
+import com.karinca.app.ui.components.PrimaryButton
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -126,15 +126,6 @@ fun GoalsScreen(
                 onAddTransaction = onAddTransaction,
             )
         },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddDialog = true },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Hedef Ekle") },
-            )
-        },
     ) { padding ->
         // Captured into a plain local val — collectAsStateWithLifecycle's delegated
         // property can't be smart-cast across branches on its own.
@@ -166,11 +157,13 @@ fun GoalsScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Bir tutar ve tarih seç, günlük ne kadar biriktirmen gerektiğini hesaplayalım. Bütçen gerçekten yettiği sürece çubuğun dolar; yetmezse haber veririz. Sağ alttaki + ile başla.",
+                    "Bir tutar ve tarih seç, günlük ne kadar biriktirmen gerektiğini hesaplayalım. Bütçen gerçekten yettiği sürece çubuğun dolar; yetmezse haber veririz.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
+                Spacer(Modifier.height(24.dp))
+                AddGoalButton(onClick = { showAddDialog = true })
             }
         } else {
             LazyColumn(
@@ -178,6 +171,7 @@ fun GoalsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth().padding(padding),
             ) {
+                item(key = "add_goal") { AddGoalButton(onClick = { showAddDialog = true }) }
                 items(currentGoals, key = { it.id }) { goal ->
                     GoalCard(
                         goal = goal,
@@ -231,6 +225,14 @@ fun GoalsScreen(
             )
         }
     }
+}
+
+// "Hedef Ekle" sits in the content itself — under the empty-state explanation, or at
+// the top of the list — instead of a floating button, which sat right beside the
+// bottom bar's own "+" (add transaction): two look-alike primary buttons a thumb apart.
+@Composable
+private fun AddGoalButton(onClick: () -> Unit) {
+    PrimaryButton(text = "Hedef Ekle", onClick = onClick, trailingIcon = Icons.Filled.Add)
 }
 
 @Composable
