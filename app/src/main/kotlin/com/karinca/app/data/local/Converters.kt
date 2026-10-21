@@ -38,6 +38,12 @@ class Converters {
     fun valueToCategoryKind(value: String?): CategoryKind? = value?.let(CategoryKind::fromValue)
 
     @TypeConverter
+    fun recurringDestinationToValue(value: RecurringDestination?): String? = value?.value
+
+    @TypeConverter
+    fun valueToRecurringDestination(value: String?): RecurringDestination? = value?.let(RecurringDestination::fromValue)
+
+    @TypeConverter
     fun piggyBankEntryReasonToValue(value: PiggyBankEntryReason?): String? = value?.value
 
     @TypeConverter

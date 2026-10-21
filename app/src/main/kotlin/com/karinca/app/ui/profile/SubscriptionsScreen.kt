@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.theme.toComposeColor
 import java.text.NumberFormat
@@ -154,8 +155,10 @@ private fun SubscriptionRow(subscription: SubscriptionWithCategory, onCancelClic
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(subscription.payment.name, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                // Incomes show a leading "+" so they read apart from the payments in the same list.
+                val sign = if (subscription.payment.type == CategoryKind.INCOME) "+" else ""
                 Text(
-                    "Her ayın ${subscription.payment.dayOfMonth}'i · ${turkishCurrencyFormat.format(subscription.payment.amount)}",
+                    "Her ayın ${subscription.payment.dayOfMonth}'i · $sign${turkishCurrencyFormat.format(subscription.payment.amount)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -14,6 +14,8 @@ data class RecurringPaymentDto(
     val amount: Double,
     @SerialName("category_id") val categoryId: String? = null,
     @SerialName("day_of_month") val dayOfMonth: Int,
+    val type: String = "expense",
+    val destination: String = "budget",
     val active: Boolean,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String,

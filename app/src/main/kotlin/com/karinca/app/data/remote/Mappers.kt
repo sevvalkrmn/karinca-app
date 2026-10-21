@@ -3,6 +3,7 @@ package com.karinca.app.data.remote
 import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.CoachTone
 import com.karinca.app.data.local.PiggyBankEntryReason
+import com.karinca.app.data.local.RecurringDestination
 import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.local.entity.ConsentEntity
@@ -208,6 +209,8 @@ fun RecurringPaymentDto.toEntity() = RecurringPaymentEntity(
     amount = amount,
     categoryId = categoryId,
     dayOfMonth = dayOfMonth,
+    type = CategoryKind.fromValue(type),
+    destination = RecurringDestination.fromValue(destination),
     active = active,
     createdAt = parseInstant(createdAt),
     updatedAt = parseInstant(updatedAt),
@@ -221,6 +224,8 @@ fun RecurringPaymentEntity.toDto() = RecurringPaymentDto(
     amount = amount,
     categoryId = categoryId,
     dayOfMonth = dayOfMonth,
+    type = type.value,
+    destination = destination.value,
     active = active,
     createdAt = createdAt.toString(),
     updatedAt = updatedAt.toString(),

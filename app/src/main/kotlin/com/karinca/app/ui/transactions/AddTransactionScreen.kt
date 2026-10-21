@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,7 +24,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -62,7 +61,6 @@ import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.ui.categories.categoryIcon
 import com.karinca.app.ui.components.KarincaWordmark
-import com.karinca.app.ui.components.LabeledIconField
 import com.karinca.app.ui.components.MascotWaveVideo
 import com.karinca.app.ui.components.PrimaryButton
 import java.text.NumberFormat
@@ -132,7 +130,9 @@ fun AddTransactionScreen(
         // without scrolling, no matter how much fits above it (category list, keypad, etc.).
         bottomBar = {
             Surface(shadowElevation = 8.dp, color = MaterialTheme.colorScheme.surface) {
-                Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                // Edge-to-edge (targetSdk 35): keep the button above the system navigation
+                // bar instead of under it, same as KarincaBottomBar.
+                Column(modifier = Modifier.navigationBarsPadding().padding(horizontal = 20.dp)) {
                     Spacer(Modifier.height(12.dp))
                     PrimaryButton(
                         text = if (uiState.isEditMode) "Güncelle" else "Kaydet",
@@ -142,144 +142,142 @@ fun AddTransactionScreen(
                         shape = PillShape,
                         trailingIcon = Icons.Filled.CheckCircle,
                     )
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(12.dp))
                 }
             }
         },
     ) { padding ->
+        // The keypad is pinned to the bottom of the content area so all four rows are
+        // always visible without scrolling. Everything above it gets the remaining space
+        // (weight) and scrolls on its own only when a short screen can't fit it.
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 20.dp),
         ) {
-            Spacer(Modifier.height(16.dp))
-
-            // Harcama / Gelir mode switch.
-            Surface(
-                shape = PillShape,
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                modifier = Modifier.fillMaxWidth(),
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
             ) {
-                Row(modifier = Modifier.padding(4.dp)) {
-                    ModeSwitchButton(
-                        text = "Harcama",
-                        selected = uiState.type == CategoryKind.EXPENSE,
-                        selectedColor = MaterialTheme.colorScheme.primary,
-                        onClick = { viewModel.onTypeChange(CategoryKind.EXPENSE) },
-                        modifier = Modifier.weight(1f),
-                    )
-                    ModeSwitchButton(
-                        text = "Gelir",
-                        selected = uiState.type == CategoryKind.INCOME,
-                        selectedColor = MaterialTheme.colorScheme.secondary,
-                        onClick = { viewModel.onTypeChange(CategoryKind.INCOME) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-            Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
 
-            // Amount display + mascot tip.
-            Surface(
-                shape = RoundedCornerShape(32.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                shadowElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    ) {
-                        Text(
-                            "MİKTAR GİRİN",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                // Harcama / Gelir mode switch.
+                Surface(
+                    shape = PillShape,
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Row(modifier = Modifier.padding(4.dp)) {
+                        ModeSwitchButton(
+                            text = "Harcama",
+                            selected = uiState.type == CategoryKind.EXPENSE,
+                            selectedColor = MaterialTheme.colorScheme.primary,
+                            onClick = { viewModel.onTypeChange(CategoryKind.EXPENSE) },
+                            modifier = Modifier.weight(1f),
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Row(verticalAlignment = Alignment.Bottom) {
+                        ModeSwitchButton(
+                            text = "Gelir",
+                            selected = uiState.type == CategoryKind.INCOME,
+                            selectedColor = MaterialTheme.colorScheme.secondary,
+                            onClick = { viewModel.onTypeChange(CategoryKind.INCOME) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+
+                // Amount display + mascot tip.
+                Surface(
+                    shape = RoundedCornerShape(32.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    shadowElevation = 2.dp,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                        ) {
                             Text(
-                                uiState.amountText,
-                                style = MaterialTheme.typography.displayLarge,
-                                color = MaterialTheme.colorScheme.primary,
+                                "MİKTAR GİRİN",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            Spacer(Modifier.height(8.dp))
+                            Row(verticalAlignment = Alignment.Bottom) {
+                                Text(
+                                    uiState.amountText,
+                                    style = MaterialTheme.typography.displayLarge,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                                Text(
+                                    " ₺",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surfaceContainerLow, RoundedCornerShape(16.dp))
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Image(painterResource(R.drawable.ic_karinca_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+                            Spacer(Modifier.width(12.dp))
                             Text(
-                                " ₺",
-                                style = MaterialTheme.typography.headlineMedium,
+                                if (uiState.type == CategoryKind.INCOME) {
+                                    "\"Bugün ne kazandın? Her birikim seni hedeflerine biraz daha yaklaştırır!\""
+                                } else {
+                                    "\"Bugün ne için harcama yaptık? Küçük adımlar büyük birikimlere dönüşür!\""
+                                },
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
+                }
+                Spacer(Modifier.height(8.dp))
+
+                // Category selection — a single horizontally scrolling row so every category is
+                // reachable without a separate "see all" sheet, and so the space a multi-row grid
+                // used to reserve goes back to the numpad below instead.
+                Text("Kategori", style = MaterialTheme.typography.headlineMedium)
+                Spacer(Modifier.height(8.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    items(visibleCategories, key = { it.id }) { category ->
+                        CategoryChip(
+                            category = category,
+                            selected = category.id == uiState.selectedCategoryId,
+                            onClick = { viewModel.onSelectCategory(category.id) },
+                        )
+                    }
+                }
+
+                // Only a brand-new expense or income can be marked recurring — editing an
+                // existing one never shows this.
+                if (!uiState.isEditMode) {
+                    val isIncome = uiState.type == CategoryKind.INCOME
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(MaterialTheme.colorScheme.surfaceContainerLow, RoundedCornerShape(16.dp))
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().clickable { viewModel.onRecurringToggle(!uiState.isRecurring) },
                     ) {
-                        Image(painterResource(R.drawable.ic_karinca_logo), contentDescription = null, modifier = Modifier.size(32.dp))
-                        Spacer(Modifier.width(12.dp))
+                        Checkbox(checked = uiState.isRecurring, onCheckedChange = viewModel::onRecurringToggle)
                         Text(
-                            if (uiState.type == CategoryKind.INCOME) {
-                                "\"Bugün ne kazandın? Her birikim seni hedeflerine biraz daha yaklaştırır!\""
-                            } else {
-                                "\"Bugün ne için harcama yaptık? Küçük adımlar büyük birikimlere dönüşür!\""
-                            },
+                            if (isIncome) "Bu her ay tekrar eden bir gelir" else "Bu her ay tekrar eden bir ödeme",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
             }
-            Spacer(Modifier.height(12.dp))
 
-            // Category selection — a single horizontally scrolling row so every category is
-            // reachable without a separate "see all" sheet, and so the space a multi-row grid
-            // used to reserve goes back to the numpad below instead.
-            Text("Kategori", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(12.dp))
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(visibleCategories, key = { it.id }) { category ->
-                    CategoryChip(
-                        category = category,
-                        selected = category.id == uiState.selectedCategoryId,
-                        onClick = { viewModel.onSelectCategory(category.id) },
-                    )
-                }
-            }
             Spacer(Modifier.height(4.dp))
-
-            // Only a brand-new expense can be marked recurring — editing an existing
-            // one, or an income, never shows this.
-            if (!uiState.isEditMode && uiState.type == CategoryKind.EXPENSE) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().clickable { viewModel.onRecurringToggle(!uiState.isRecurring) },
-                ) {
-                    Checkbox(checked = uiState.isRecurring, onCheckedChange = viewModel::onRecurringToggle)
-                    Text(
-                        "Bu her ay tekrar eden bir ödeme",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (uiState.isRecurring) {
-                    Spacer(Modifier.height(8.dp))
-                    LabeledIconField(
-                        label = "Ödeme Adı",
-                        value = uiState.recurringName,
-                        onValueChange = viewModel::onRecurringNameChange,
-                        leadingIcon = Icons.Filled.Autorenew,
-                        placeholder = "Netflix, kira, vb.",
-                    )
-                }
-                Spacer(Modifier.height(4.dp))
-            }
-
             NumericKeypad(onDigit = viewModel::onDigit, onBackspace = viewModel::onBackspace)
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
         }
 
         if (showDeleteConfirm) {
@@ -456,14 +454,14 @@ private fun NumericKeypad(onDigit: (Char) -> Unit, onBackspace: () -> Unit) {
         listOf('7', '8', '9'),
         listOf(' ', '0', ','), // ' ' marker = backspace key
     )
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         rows.forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 row.forEach { key ->
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         color = if (key == ' ') MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceContainer,
-                        modifier = Modifier.weight(1f).aspectRatio(1.9f).clickable {
+                        modifier = Modifier.weight(1f).height(48.dp).clickable {
                             if (key == ' ') onBackspace() else onDigit(key)
                         },
                     ) {

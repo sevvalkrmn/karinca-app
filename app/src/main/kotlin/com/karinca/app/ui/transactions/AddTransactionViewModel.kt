@@ -3,6 +3,7 @@ package com.karinca.app.ui.transactions
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karinca.app.data.local.CategoryKind
+import com.karinca.app.data.local.RecurringDestination
 import com.karinca.app.data.local.ReferenceType
 import com.karinca.app.data.local.entity.CategoryEntity
 import com.karinca.app.data.repository.AuthRepository
@@ -38,9 +39,9 @@ data class AddTransactionUiState(
     val isSaving: Boolean = false,
     val isEditMode: Boolean = false,
     val errorMessage: String? = null,
-    // Only ever meaningful for a brand-new expense — hidden/reset for income and for edits.
+    // Only ever meaningful for a brand-new expense or income — hidden for edits, and
+    // reset whenever the Harcama/Gelir mode switches.
     val isRecurring: Boolean = false,
-    val recurringName: String = "",
 ) {
     val canSave: Boolean
         get() = selectedCategoryId != null && (amountText.replace(',', '.').toDoubleOrNull() ?: 0.0) > 0.0
@@ -131,16 +132,13 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun onTypeChange(type: CategoryKind) = _uiState.update { it.copy(type = type, selectedCategoryId = null) }
+    fun onTypeChange(type: CategoryKind) = _uiState.update {
+        it.copy(type = type, selectedCategoryId = null, isRecurring = false)
+    }
 
     fun onSelectCategory(categoryId: String) = _uiState.update { it.copy(selectedCategoryId = categoryId) }
 
-    // Unchecking clears the name too, so a stray leftover name can't linger if the
-    // user unchecks and rechecks later.
-    fun onRecurringToggle(checked: Boolean) =
-        _uiState.update { it.copy(isRecurring = checked, recurringName = if (checked) it.recurringName else "") }
-
-    fun onRecurringNameChange(name: String) = _uiState.update { it.copy(recurringName = name) }
+    fun onRecurringToggle(checked: Boolean) = _uiState.update { it.copy(isRecurring = checked) }
 
     fun onDigit(digit: Char) {
         _uiState.update { state ->
@@ -220,6 +218,14 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
                 piggyBankRepository.recordManualDeposit(uid, pending.amount)
+                createRecurringIfRequested(
+                    userId = uid,
+                    amount = pending.amount,
+                    categoryId = pending.categoryId,
+                    type = CategoryKind.INCOME,
+                    destination = RecurringDestination.KUMBARA,
+                    dayOfMonth = LocalDate.now().dayOfMonth,
+                )
                 syncScheduler.requestImmediateSync()
                 _events.emit(AddTransactionEvent.Saved)
             } catch (e: CancellationException) {
@@ -285,15 +291,13 @@ class AddTransactionViewModel @Inject constructor(
             if (overageToWithdraw > 0.0) {
                 piggyBankRepository.recordOverspendWithdrawal(userId, overageToWithdraw, transactionId)
             }
-            // This manual entry IS this month's payment; the AI service's monthly job
-            // only starts auto-creating it from next month on.
-            val recurringState = uiState.value
-            if (id == null && type == CategoryKind.EXPENSE && recurringState.isRecurring && recurringState.recurringName.isNotBlank()) {
-                recurringPaymentRepository.create(
+            if (id == null) {
+                createRecurringIfRequested(
                     userId = userId,
-                    name = recurringState.recurringName.trim(),
                     amount = amount,
                     categoryId = categoryId,
+                    type = type,
+                    destination = RecurringDestination.BUDGET,
                     dayOfMonth = occurredAt.dayOfMonth,
                 )
             }
@@ -306,6 +310,32 @@ class AddTransactionViewModel @Inject constructor(
         } finally {
             _uiState.update { it.copy(isSaving = false) }
         }
+    }
+
+    // This manual entry IS this month's one; the AI service's monthly job only starts
+    // auto-creating it from next month on, as a transaction (expense / BUDGET income)
+    // or a Kumbara deposit (KUMBARA income).
+    private suspend fun createRecurringIfRequested(
+        userId: String,
+        amount: Double,
+        categoryId: String,
+        type: CategoryKind,
+        destination: RecurringDestination,
+        dayOfMonth: Int,
+    ) {
+        if (!uiState.value.isRecurring) return
+        // No separate name is asked for — the category already says what it is
+        // ("Abonelik", "Maaş/Burs", ...), so that's what Abonelikler lists it as.
+        val name = categories.value.firstOrNull { it.id == categoryId }?.name ?: return
+        recurringPaymentRepository.create(
+            userId = userId,
+            name = name,
+            amount = amount,
+            categoryId = categoryId,
+            dayOfMonth = dayOfMonth,
+            type = type,
+            destination = destination,
+        )
     }
 
     fun delete() {

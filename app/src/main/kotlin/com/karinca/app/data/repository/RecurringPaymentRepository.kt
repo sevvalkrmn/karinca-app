@@ -1,7 +1,9 @@
 package com.karinca.app.data.repository
 
 import androidx.room.withTransaction
+import com.karinca.app.data.local.CategoryKind
 import com.karinca.app.data.local.KarincaDatabase
+import com.karinca.app.data.local.RecurringDestination
 import com.karinca.app.data.local.dao.OutboxDao
 import com.karinca.app.data.local.dao.RecurringPaymentDao
 import com.karinca.app.data.local.entity.OutboxEntity
@@ -21,10 +23,19 @@ class RecurringPaymentRepository @Inject constructor(
 ) {
     fun observeActive(userId: String): Flow<List<RecurringPaymentEntity>> = recurringPaymentDao.observeActive(userId)
 
-    // Called alongside the normal expense transaction when the "tekrar eden ödeme"
-    // checkbox is on — this manual entry IS this month's payment; the AI service's
-    // monthly job only starts auto-creating from next month on.
-    suspend fun create(userId: String, name: String, amount: Double, categoryId: String?, dayOfMonth: Int): String {
+    // Called alongside the normal transaction (or, for a KUMBARA income, the Kumbara
+    // deposit) when the "tekrar eden" checkbox is on — this manual entry IS this
+    // month's one; the AI service's monthly job only starts auto-creating from next
+    // month on.
+    suspend fun create(
+        userId: String,
+        name: String,
+        amount: Double,
+        categoryId: String?,
+        dayOfMonth: Int,
+        type: CategoryKind,
+        destination: RecurringDestination = RecurringDestination.BUDGET,
+    ): String {
         val now = Instant.now()
         val entity = RecurringPaymentEntity(
             id = UUID.randomUUID().toString(),
@@ -33,6 +44,8 @@ class RecurringPaymentRepository @Inject constructor(
             amount = amount,
             categoryId = categoryId,
             dayOfMonth = dayOfMonth.coerceIn(1, 28),
+            type = type,
+            destination = destination,
             active = true,
             createdAt = now,
             updatedAt = now,

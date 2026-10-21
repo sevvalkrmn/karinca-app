@@ -168,10 +168,16 @@ class SupabaseGateway:
         )
 
     def ensure_recurring_payment_transaction(
-        self, transaction_id: str, user_id: str, category_id: str | None, amount: float, occurred_at: date
+        self,
+        transaction_id: str,
+        user_id: str,
+        category_id: str | None,
+        amount: float,
+        occurred_at: date,
+        transaction_type: str = "expense",
     ) -> bool:
-        """Same check-then-insert idempotency as ensure_auto_income_transaction, just
-        for an expense instead of the fixed income category."""
+        """Same check-then-insert idempotency as ensure_auto_income_transaction, for
+        the row's own category and type (an expense, or a 'budget'-destination income)."""
         existing = self._client.table("transactions").select("id").eq("id", transaction_id).execute().data
         if existing:
             return False
@@ -181,10 +187,30 @@ class SupabaseGateway:
                 "id": transaction_id,
                 "user_id": user_id,
                 "category_id": category_id,
-                "type": "expense",
+                "type": transaction_type,
                 "amount": amount,
                 "occurred_at": occurred_at.isoformat(),
-                "source": "auto_recurring_payment",
+                "source": "auto_recurring_payment" if transaction_type == "expense" else "auto_recurring_income",
+                "created_at": now,
+                "updated_at": now,
+            }
+        ).execute()
+        return True
+
+    def ensure_recurring_income_deposit(self, entry_id: str, user_id: str, amount: float) -> bool:
+        """A 'kumbara'-destination recurring income: the same manual_deposit entry the
+        client records for "Kumbaraya At" (no transaction), with a deterministic id so
+        a re-run never deposits the same month twice."""
+        existing = self._client.table("piggy_bank_entries").select("id").eq("id", entry_id).execute().data
+        if existing:
+            return False
+        now = _now_iso()
+        self._client.table("piggy_bank_entries").insert(
+            {
+                "id": entry_id,
+                "user_id": user_id,
+                "amount": amount,
+                "reason": "manual_deposit",
                 "created_at": now,
                 "updated_at": now,
             }

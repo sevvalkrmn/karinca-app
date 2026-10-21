@@ -50,3 +50,14 @@ enum class PiggyBankEntryReason(val value: String) {
         fun fromValue(value: String): PiggyBankEntryReason = entries.first { it.value == value }
     }
 }
+
+// Where a recurring income lands each month — remembers the "Mevcut Bütçeye Ekle" /
+// "Kumbaraya At" choice made when it was first logged. Always BUDGET for expenses.
+enum class RecurringDestination(val value: String) {
+    BUDGET("budget"),
+    KUMBARA("kumbara");
+
+    companion object {
+        fun fromValue(value: String): RecurringDestination = entries.first { it.value == value }
+    }
+}
