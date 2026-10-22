@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karınca Gizlilik Politikası</title>
+<style>
+  :root { --red: #C7371A; --text: #2B1B17; --muted: #6E5E59; --bg: #FEF8F6; --card: #FFFFFF; --line: #F0E1DC; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.65 -apple-system, "Segoe UI", Inter, Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { margin-bottom: 28px; }
+  .brand { color: var(--red); font-weight: 800; font-size: 28px; letter-spacing: -0.5px; }
+  h1 { font-size: 30px; line-height: 1.25; margin: 8px 0 6px; }
+  .meta { color: var(--muted); font-size: 14px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; margin: 14px 0; }
+  h2 { font-size: 19px; margin: 0 0 10px; color: var(--red); }
+  ul { padding-left: 20px; margin: 8px 0; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 6px; border-top: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  a { color: var(--red); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="brand">karınca</div>
+    <h1>Gizlilik Politikası</h1>
+    <div class="meta">Yürürlük tarihi: 22 Ekim 2026</div>
+  </header>
+
+  <section>
+    <h2>1. Kimiz?</h2>
+    <p>Bu politika, Android için geliştirilen <strong>Karınca</strong> bütçe takip uygulamasının (“Uygulama”) kişisel verilerinizi nasıl topladığını, kullandığını, sakladığını ve paylaştığını açıklar.</p>
+    <p>6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) kapsamında veri sorumlusu <strong>Şevval Karaman</strong>’dır. Her türlü soru ve talebiniz için: <a href="mailto:sevvalkrmn14@gmail.com">sevvalkrmn14@gmail.com</a></p>
+  </section>
+
+  <section>
+    <h2>2. Topladığımız veriler</h2>
+    <table>
+      <tr><th>Veri</th><th>Ne zaman toplanır</th></tr>
+      <tr><td>E-posta adresi, ad ve soyad</td><td>E-posta ile ya da Google hesabınızla kayıt olduğunuzda</td></tr>
+      <tr><td>Telefon numarası</td><td>Telefon numarasıyla giriş yaptığınızda (doğrulama kodu göndermek için)</td></tr>
+      <tr><td>Şifre</td><td>E-posta ile kayıt olduğunuzda; yalnızca şifrelenmiş (hash) olarak saklanır, kimse göremez</td></tr>
+      <tr><td>Gelir ve harcama kayıtları (tutar, kategori, tarih)</td><td>Uygulamaya işlem eklediğinizde</td></tr>
+      <tr><td>Aylık gelir, harcama limiti, hedefler, Kumbara hareketleri, tekrar eden ödeme ve gelirler</td><td>Bu bilgileri girdiğinizde ya da uygulama sizin adınıza otomatik kayıt oluşturduğunda</td></tr>
+      <tr><td>Açık rıza kayıtları</td><td>KVKK aydınlatma metinlerini onayladığınızda</td></tr>
+    </table>
+    <p><strong>Toplamadığımız veriler:</strong> Konum, rehber, fotoğraflar, banka hesap ya da kart bilgileri, reklam kimliği. Uygulamada reklam ve reklam takip araçları bulunmaz.</p>
+  </section>
+
+  <section>
+    <h2>3. Verilerinizi neden kullanırız?</h2>
+    <ul>
+      <li>Hesabınızı oluşturmak ve güvenli şekilde giriş yapmanızı sağlamak</li>
+      <li>Bütçe takibi hizmetini sunmak: bakiyenizi, limitinizi, hedeflerinizi ve raporlarınızı hesaplamak</li>
+      <li>Aylık otomatik işlemleri yapmak: maaş/burs gelirinizi eklemek, tekrar eden ödeme ve gelirlerinizi oluşturmak, artan paranızı Kumbara’ya aktarmak</li>
+      <li>Verilerinizi aynı hesapla kullandığınız cihazlar arasında eşitlemek</li>
+      <li>Hesap silme gibi taleplerinizi yerine getirmek</li>
+    </ul>
+    <p>Verileriniz reklam amacıyla kullanılmaz, satılmaz ve pazarlama amacıyla üçüncü kişilerle paylaşılmaz.</p>
+  </section>
+
+  <section>
+    <h2>4. Verilerinizi kimlerle paylaşırız?</h2>
+    <p>Verileriniz yalnızca hizmeti sunmamız için gereken altyapı sağlayıcılarıyla, yalnızca bu amaçla paylaşılır:</p>
+    <table>
+      <tr><th>Sağlayıcı</th><th>Amaç</th><th>Konum</th></tr>
+      <tr><td>Supabase</td><td>Veritabanı, kullanıcı hesapları ve kimlik doğrulama</td><td>Avrupa Birliği (Frankfurt, Almanya)</td></tr>
+      <tr><td>Render</td><td>Aylık otomatik işlemleri ve hesap silmeyi yürüten sunucumuzun barındırılması</td><td>Amerika Birleşik Devletleri</td></tr>
+      <tr><td>Google</td><td>“Google ile devam et” seçeneğiyle giriş</td><td>Google altyapısı</td></tr>
+      <tr><td>SMS hizmet sağlayıcısı</td><td>Telefonla girişte doğrulama kodunun gönderilmesi</td><td>Sağlayıcı altyapısı</td></tr>
+    </table>
+    <p>Bu hizmetler nedeniyle verileriniz Türkiye dışındaki sunucularda işlenebilir. Uygulamayı kullanmaya başlarken bu aktarım için açık rızanız alınır.</p>
+    <p><strong>Yapay zekâ:</strong> Uygulamanın bu sürümünde yapay zekâ destekli analiz özelliği bulunmaz ve verileriniz herhangi bir yapay zekâ hizmetine gönderilmez. Bu özellik ileride eklenirse, verileriniz gönderilmeden önce ayrıca açık rızanız alınır ve bu politika güncellenir.</p>
+    <p>Yasal bir zorunluluk olması halinde, yetkili kamu kurum ve kuruluşlarıyla mevzuatın gerektirdiği ölçüde paylaşım yapılabilir.</p>
+  </section>
+
+  <section>
+    <h2>5. Verilerinizi ne kadar süre saklarız?</h2>
+    <p>Verileriniz, hesabınız açık olduğu sürece saklanır. Hesabınızı sildiğinizde hesabınız ve ona bağlı tüm kayıtlarınız (işlemler, hedefler, Kumbara, tekrar eden ödemeler, rıza kayıtları) veritabanımızdan kalıcı olarak silinir. Telefonunuzdaki yerel kopya da aynı anda temizlenir.</p>
+  </section>
+
+  <section>
+    <h2>6. Hesabınızı ve verilerinizi nasıl silersiniz?</h2>
+    <ul>
+      <li><strong>Uygulama içinden:</strong> Profil → Hesabımı Sil → Sil</li>
+      <li><strong>Uygulamaya erişiminiz yoksa:</strong> Hesabınıza kayıtlı e-posta adresinden ya da telefon numarasını belirterek <a href="mailto:sevvalkrmn14@gmail.com?subject=Karınca%20hesap%20silme%20talebi">sevvalkrmn14@gmail.com</a> adresine “Hesap silme talebi” konulu bir e-posta gönderin. Talebiniz en geç 30 gün içinde yerine getirilir.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>7. Verilerinizi nasıl koruruz?</h2>
+    <ul>
+      <li>Uygulama ile sunucular arasındaki tüm iletişim şifrelidir (HTTPS/TLS).</li>
+      <li>Veritabanında her kullanıcı yalnızca kendi kayıtlarına erişebilir (satır düzeyinde güvenlik).</li>
+      <li>Şifreler yalnızca şifrelenmiş (hash) olarak saklanır.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. KVKK kapsamındaki haklarınız</h2>
+    <p>KVKK’nın 11. maddesi uyarınca; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını öğrenme, aktarıldığı üçüncü kişileri bilme, eksik ya da yanlış işlenmişse düzeltilmesini isteme, silinmesini ya da yok edilmesini isteme, bu işlemlerin aktarıldığı üçüncü kişilere bildirilmesini isteme, otomatik sistemlerle analiz edilmesi sonucu aleyhinize bir sonuca itiraz etme ve kanuna aykırı işleme nedeniyle zarara uğramanız halinde zararın giderilmesini talep etme haklarına sahipsiniz.</p>
+    <p>Taleplerinizi <a href="mailto:sevvalkrmn14@gmail.com">sevvalkrmn14@gmail.com</a> adresine iletebilirsiniz. Verdiğiniz açık rızayı istediğiniz zaman geri alabilirsiniz; bu durumda hizmetin sunulabilmesi için hesabınızın silinmesi gerekebilir.</p>
+  </section>
+
+  <section>
+    <h2>9. Çocukların gizliliği</h2>
+    <p>Uygulama 13 yaşından küçük çocuklara yönelik değildir ve bilerek 13 yaşından küçüklerden veri toplamayız. Böyle bir durumu fark etmeniz halinde bize ulaşın; ilgili verileri sileriz.</p>
+  </section>
+
+  <section>
+    <h2>10. Değişiklikler</h2>
+    <p>Bu politikayı güncellediğimizde yürürlük tarihini değiştiririz. Önemli değişikliklerde sizi uygulama içinden bilgilendiririz.</p>
+  </section>
+</main>
+</body>
+</html>
